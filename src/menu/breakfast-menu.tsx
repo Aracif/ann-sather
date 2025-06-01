@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Search, Filter, Coffee, Utensils, Star, ChevronRight, Clock, ChevronDown, Sparkles } from 'lucide-react';
 
 // Full menu data from your JSON
@@ -151,6 +151,46 @@ const CompleteMenu = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [expandedSections, setExpandedSections] = useState({});
     const [priceFilter, setPriceFilter] = useState('all');
+    const menuSectionRef = useRef(null);
+
+    // Handle category change with better scroll handling
+    const handleCategoryChange = (category) => {
+        // First, update the category
+        setActiveCategory(category);
+
+        // Then ensure the menu is visible
+        setTimeout(() => {
+            // Get the menu section element
+            const menuSection = menuSectionRef.current;
+            if (!menuSection) return;
+
+            // Get current viewport and menu section positions
+            const menuRect = menuSection.getBoundingClientRect();
+            const viewportHeight = window.innerHeight;
+
+            // Check if menu content is below the viewport
+            if (menuRect.top > viewportHeight * 0.5) {
+                // Scroll to put menu section at a comfortable viewing position
+                // Account for sticky elements: nav (~80px) + search bar (~100px)
+                const offset = 200; // Total height of sticky elements
+                const scrollPosition = menuSection.offsetTop - offset;
+
+                window.scrollTo({
+                    top: scrollPosition,
+                    behavior: 'smooth'
+                });
+            } else if (menuRect.bottom < 200) {
+                // If menu bottom is too high, scroll down a bit
+                const offset = 200;
+                const scrollPosition = menuSection.offsetTop - offset;
+
+                window.scrollTo({
+                    top: scrollPosition,
+                    behavior: 'smooth'
+                });
+            }
+        }, 50);
+    };
 
     // Toggle section expansion
     const toggleSection = (section) => {
@@ -159,6 +199,17 @@ const CompleteMenu = () => {
             [section]: !prev[section]
         }));
     };
+
+    // Auto-expand first section of active category
+    useEffect(() => {
+        const firstSection = Object.keys(menuData[activeCategory])[0];
+        if (firstSection) {
+            setExpandedSections(prev => ({
+                ...prev,
+                [`${activeCategory}-${firstSection}`]: true
+            }));
+        }
+    }, [activeCategory]);
 
     // Filter menu items based on search and price
     const filteredMenu = useMemo(() => {
@@ -240,46 +291,46 @@ const CompleteMenu = () => {
                 </div>
             </div>
 
-            {/* Search and Filter Bar */}
-            <div className="sticky top-0 z-40 bg-white shadow-md">
-                <div className="max-w-7xl mx-auto px-4 py-4">
-                    <div className="flex flex-col md:flex-row gap-4">
-                        <div className="flex-1">
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                                <input
-                                    type="text"
-                                    placeholder="Search menu items..."
-                                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                />
+            <div className="max-w-7xl mx-auto px-4">
+                {/* Search and Filter Bar - Sticky with proper offset */}
+                <div className="sticky top-24 lg:top-28 z-30 bg-gray-50 pt-8 pb-4">
+                    <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200">
+                        <div className="flex flex-col md:flex-row gap-4">
+                            <div className="flex-1">
+                                <div className="relative">
+                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                                    <input
+                                        type="text"
+                                        placeholder="Search menu items..."
+                                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                    />
+                                </div>
                             </div>
-                        </div>
-                        <div className="flex gap-2">
-                            <div className="relative">
-                                <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                                <select
-                                    className="pl-10 pr-8 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
-                                    value={priceFilter}
-                                    onChange={(e) => setPriceFilter(e.target.value)}
-                                >
-                                    <option value="all">All Prices</option>
-                                    <option value="under10">Under $10</option>
-                                    <option value="under15">Under $15</option>
-                                    <option value="over15">$15 and up</option>
-                                </select>
+                            <div className="flex gap-2">
+                                <div className="relative">
+                                    <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                                    <select
+                                        className="pl-10 pr-8 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
+                                        value={priceFilter}
+                                        onChange={(e) => setPriceFilter(e.target.value)}
+                                    >
+                                        <option value="all">All Prices</option>
+                                        <option value="under10">Under $10</option>
+                                        <option value="under15">Under $15</option>
+                                        <option value="over15">$15 and up</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div className="max-w-7xl mx-auto px-4 py-8">
-                <div className="flex flex-col lg:flex-row gap-8">
+                <div className="flex flex-col lg:flex-row gap-8 pb-8" ref={menuSectionRef} style={{ scrollMarginTop: '200px' }}>
                     {/* Category Navigation */}
                     <div className="lg:w-64">
-                        <div className="sticky top-32">
+                        <div className="sticky top-64 lg:top-72">
                             <h3 className="text-lg font-bold text-gray-900 mb-4">Categories</h3>
                             <nav className="space-y-2">
                                 {Object.keys(menuData).map((category) => {
@@ -287,7 +338,7 @@ const CompleteMenu = () => {
                                     return (
                                         <button
                                             key={category}
-                                            onClick={() => setActiveCategory(category)}
+                                            onClick={() => handleCategoryChange(category)}
                                             className={`w-full text-left px-4 py-3 rounded-lg flex items-center justify-between transition-all ${
                                                 activeCategory === category
                                                     ? 'bg-blue-900 text-white shadow-lg'
@@ -316,7 +367,7 @@ const CompleteMenu = () => {
                     </div>
 
                     {/* Menu Content */}
-                    <div className="flex-1">
+                    <div className="flex-1 min-h-screen">
                         {Object.entries(filteredMenu).map(([category, sections]) => (
                             <div
                                 key={category}
