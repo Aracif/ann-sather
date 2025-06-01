@@ -293,7 +293,7 @@ const CompleteMenu = () => {
 
             <div className="max-w-7xl mx-auto px-4">
                 {/* Search and Filter Bar - Sticky with proper offset */}
-                <div className="sticky top-24 lg:top-28 z-30 bg-gray-50 pt-8 pb-4">
+                <div className="sticky top-24 lg:top-9 z-30 bg-gray-50 pt-8 pb-4">
                     <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200">
                         <div className="flex flex-col md:flex-row gap-4">
                             <div className="flex-1">
