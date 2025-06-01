@@ -1,137 +1,400 @@
-import React from 'react';
-import { Tab } from '@headlessui/react';
+import React, { useState, useMemo } from 'react';
+import { Search, Filter, Coffee, Utensils, Star, ChevronRight, Clock, ChevronDown, Sparkles } from 'lucide-react';
 
-/**
- * BreakfastMenu.tsx  –  TypeScript version
- * ------------------------------------------------------------
- *  • Uses Headless UI Tabs for accessible switching.
- *  • Tailwind utility classes keep styling consistent.
- *  • Fully typed (MenuItem, Categories).
- * ------------------------------------------------------------
- *  Peer deps (if missing):
- *      npm install @headlessui/react
- *      npm install -D @types/react  # if not already in project
- */
-
-type MenuItem = {
-    title: string;
-    price: string;
-    description?: string;
+// Full menu data from your JSON
+const menuData = {
+    "Breakfast": {
+        "EGGS BENEDICT": [
+            { title: "Traditional Benedict", price: "$16.00" },
+            { title: "Steak & Eggs Benedict", price: "$17.50" },
+            { title: "Crab Cake Benedict", price: "$16.50" },
+            { title: "Smoked Salmon Benedict", price: "$17.50" },
+            { title: "Veggie Florentine", price: "$15.50" },
+            { title: "Southern Decadence", price: "$16.50" }
+        ],
+        "THREE EGG OMELETS": [
+            { title: "Build Your Own Omelet", price: "$14.95" },
+            { title: "Denver Omelet", price: "$15.45" },
+            { title: "Mexican Omelet", price: "$16.50" },
+            { title: "V-4 Omelet", price: "$16.50" },
+            { title: "Garden Omelet", price: "$15.25" },
+            { title: "Mediterranean Omelet", price: "$16.50" },
+            { title: "Salmon Dill Omelet", price: "$17.50" },
+            { title: "Chicken Fajita Omelet", price: "$17.50" }
+        ],
+        "EGGS": [
+            { title: "Two Eggs, Any Style", price: "$13.25" },
+            { title: "With Corned Beef Hash", price: "$17.45" },
+            { title: "With Bacon or Sausage", price: "$14.45" },
+            { title: "With Country Ham", price: "$14.45" },
+            { title: "With Chicken Basil Sausage", price: "$14.75" },
+            { title: "With Swedish Potato Sausage", price: "$15.00" },
+            { title: "With Beef Steak", price: "$17.50" }
+        ],
+        "BREAKFAST WRAPS": [
+            { title: "Sausage, Egg and Cheese Wrap", price: "$15.25" },
+            { title: "Bacon, Egg and Cheese Wrap", price: "$15.25" },
+            { title: "Ham, Egg and Cheese Wrap", price: "$15.25" },
+            { title: "Avocado Delight Wrap", price: "$16.25" },
+            { title: "Sunrise Breakfast Wrap", price: "$16.45" },
+            { title: "Build Your Own Wrap", price: "$14.95" }
+        ],
+        "PANCAKES, WAFFLES & MORE": [
+            { title: "Swedish Pancakes with Lingonberries", price: "$13.50" },
+            { title: "Two Swedish Pancakes with Two Eggs Any Style", price: "$14.50" },
+            { title: "Two Swedish Pancakes with Two Swedish Meatballs", price: "$14.50" },
+            { title: "Potato Pancakes with Apple Sauce", price: "$13.95" },
+            { title: "Homemade French Toast", price: "$13.95" },
+            { title: "Swedish Waffles", price: "$13.95" },
+            { title: "Biscuits and Gravy with Sausage Patties", price: "$13.95" }
+        ],
+        "A LA CARTE": [
+            { title: "3 Slices Extra Lean Bacon", price: "$3.95" },
+            { title: "2 Chicken Basil Sausage Links", price: "$4.50" },
+            { title: "Country Ham", price: "$4.25" },
+            { title: "2 Sausage Patties", price: "$3.95" },
+            { title: "2 Sausage Links", price: "$3.95" },
+            { title: "3 Turkey Sausage Links", price: "$4.25" },
+            { title: "Swedish Potato Sausage", price: "$4.25" },
+            { title: "Homemade Hash Browns", price: "$3.25" },
+            { title: "2 Homemade Cinnamon Rolls", price: "$4.75" },
+            { title: "2 Hot Biscuits with Honey", price: "$4.25" },
+            { title: "Sliced Avocado", price: "$3.75" },
+            { title: "Pecan Roll", price: "$4.25" },
+            { title: "Sweet Muffin", price: "$2.75" },
+            { title: "Toast", price: "$2.95" }
+        ],
+        "FRUIT & CEREAL": [
+            { title: "Fresh Fruit Bowl", price: "$7.50" },
+            { title: "Small Fruit Cup", price: "$4.50" },
+            { title: "Granola with Fresh Fruit", price: "$9.50" },
+            { title: "Granola with Milk or Yogurt", price: "$9.50" },
+            { title: "Granola with Fresh Fruit and Yogurt", price: "$11.50" },
+            { title: "Hot Oatmeal", price: "$6.95" },
+            { title: "Rice Porridge", price: "$6.95" }
+        ],
+        "BEVERAGES": [
+            { title: "Bottomless Coffee, Regular or Decaffeinated", price: "$3.50" },
+            { title: "Hot Tea", price: "$3.50" },
+            { title: "Soda or Iced Tea", price: "$3.50" },
+            { title: "Fresh Orange Juice", price: "$3.75" },
+            { title: "Fresh Grapefruit Juice", price: "$3.75" },
+            { title: "Apple, Tomato or Cranberry Juice", price: "$3.50" },
+            { title: "White or Chocolate Milk", price: "$3.50" },
+            { title: "Fresh Strawberry, Orange, Banana Juice", price: "$4.25" }
+        ]
+    },
+    "Lunch": {
+        "HOT SANDWICHES": [
+            { title: "Build Your Own Burger", price: "$12.50" },
+            { title: "Open Face Sandwiches", price: "$13.50" },
+            { title: "Reuben Sandwich", price: "$13.50" },
+            { title: "Tuna Melt Sandwich", price: "$13.50" }
+        ],
+        "COLD SANDWICHES": [
+            { title: "Chicken Salad Sandwich", price: "$12.50" },
+            { title: "Classic BLT Sandwich", price: "$11.95" },
+            { title: "Made to Order Egg Salad Sandwich", price: "$11.50" },
+            { title: "Roasted Veggie and Hummus Sandwich", price: "$11.95" },
+            { title: "White Albacore Tuna Salad Sandwich", price: "$12.50" }
+        ],
+        "SOUPS AND SALADS": [
+            { title: "Soup of the Day", price: "$4.95" },
+            { title: "Vegetarian Chili", price: "$6.95" },
+            { title: "Hearts Delight Salad", price: "$13.50" },
+            { title: "Broiled Salmon Salad", price: "$16.95" },
+            { title: "Southwest Chicken Salad", price: "$15.95" },
+            { title: "Fresh Fruit and Chicken Salad", price: "$14.95" },
+            { title: "Grilled Chicken Breast Salad", price: "$15.95" },
+            { title: "Caesar Tortllini Salad", price: "$14.95" }
+        ]
+    },
+    "Specials": {
+        "BREAKFAST SPECIALS": [
+            { title: "Swedish Breakfast Sampler", price: "$16.45", featured: true },
+            { title: "French Toast Fantasy", price: "$14.50", featured: true },
+            { title: "Monte Cristo Breakfast", price: "$16.45" },
+            { title: "Bacon Cheddar Potato Pancakes", price: "$15.45" },
+            { title: "Ann's Darling", price: "$12.95" },
+            { title: "Lumberjack Wrap", price: "$15.45" },
+            { title: "Turkey Gobbler Wrap", price: "$15.95" },
+            { title: "Breakfast Sandwich", price: "$15.95" }
+        ],
+        "LUNCH SPECIALS": [
+            { title: "Soup and Half a Cold Sandwich", price: "$12.95" },
+            { title: "Vegetarian Chili and Half a Cold Sandwich", price: "$13.75" },
+            { title: "Spinach Salad", price: "$13.75" },
+            { title: "Turkey Club", price: "$14.50" },
+            { title: "Deluxe Garden Salad", price: "$9.75" }
+        ]
+    },
+    "Entrees": {
+        "ANN'S CLASSIC ENTRÉES": [
+            { title: "Tom Turkey Dinner", price: "$16.75" },
+            { title: "Broiled Salmon", price: "$18.00" },
+            { title: "Crab Cakes", price: "$17.75" },
+            { title: "Swedish Meatballs", price: "$15.50", featured: true },
+            { title: "Grilled Breast of Chicken", price: "$16.25" }
+        ]
+    }
 };
 
-type Categories = Record<string, MenuItem[]>;
+// Featured items for quick access
+const featuredItems = [
+    { title: "Famous Cinnamon Rolls", price: "$4.75", category: "Breakfast", icon: Sparkles },
+    { title: "Swedish Pancakes", price: "$13.50", category: "Breakfast", icon: Star },
+    { title: "Swedish Meatballs", price: "$15.50", category: "Entrees", icon: Star }
+];
 
-const categories: Categories = {
-    'Egg Entrees': [
-        {
-            title: 'Two Eggs, Any Style*',
-            price: '$13.25',
-            description: 'Served with your choice of two sides.',
-        },
-        {
-            title: 'Two Eggs with Bacon or Sausage*',
-            price: '$14.45',
-            description: 'Choose extra‑lean bacon or our house sausage.',
-        },
-        {
-            title: 'Two Eggs with Corned Beef Hash*',
-            price: '$17.45',
-            description: 'Topped with homemade corned‑beef hash.',
-        },
-    ],
+const CompleteMenu = () => {
+    const [activeCategory, setActiveCategory] = useState('Breakfast');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [expandedSections, setExpandedSections] = useState({});
+    const [priceFilter, setPriceFilter] = useState('all');
 
-    '3‑Egg Omelets': [
-        {
-            title: 'Build Your Own Omelet*',
-            price: '$14.95',
-            description: 'Start with cheddar; add veggies, meats or cheeses.',
-        },
-        {
-            title: 'Denver Omelet*',
-            price: '$15.45',
-            description: 'Ham, green pepper, onion & cheddar.',
-        },
-        {
-            title: 'Crab Cake Benedict*',
-            price: '$16.50',
-            description: 'Poached eggs over Cajun crab cakes, hollandaise.',
-        },
-    ],
+    // Toggle section expansion
+    const toggleSection = (section) => {
+        setExpandedSections(prev => ({
+            ...prev,
+            [section]: !prev[section]
+        }));
+    };
 
-    'Pancakes, Waffles & More': [
-        {
-            title: 'Swedish Pancakes w/ Lingonberries',
-            price: '$13.50',
-            description: 'Three thin pancakes served with tart lingonberries.',
-        },
-        {
-            title: 'French Toast Fantasy',
-            price: '$14.50',
-            description:
-                'Mascarpone‑filled cinnamon rolls battered & grilled; topped with berries.',
-        },
-    ],
+    // Filter menu items based on search and price
+    const filteredMenu = useMemo(() => {
+        const filtered = {};
 
-    'Bakery Faves': [
-        { title: '2 Homemade Cinnamon Rolls', price: '$4.75' },
-        { title: '½ Dozen Cinnamon Rolls', price: '$12.50' },
-        { title: '1 Dozen Cinnamon Rolls', price: '$22.00' },
-    ],
-};
+        Object.entries(menuData).forEach(([category, sections]) => {
+            const filteredSections = {};
 
-const BreakfastMenu: React.FC = () => (
-    <section id="breakfast-menu" className="py-20 bg-white">
-        <div className="max-w-5xl mx-auto px-4">
-            <h2 className="text-4xl font-bold text-center text-blue-900 mb-8">
-                Breakfast Menu
-            </h2>
+            Object.entries(sections).forEach(([section, items]) => {
+                const filteredItems = items.filter(item => {
+                    const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase());
 
-            <Tab.Group>
-                {/* Tabs */}
-                <Tab.List className="flex flex-wrap justify-center gap-3 mb-12">
-                    {Object.keys(categories).map((category) => (
-                        <Tab key={category} className={({ selected }) =>
-                            `${selected
-                                ? 'bg-blue-900 text-white border-blue-900 shadow-lg'
-                                : 'bg-white text-blue-900 border-blue-300 hover:bg-blue-50'} px-4 py-2 rounded-full text-sm font-semibold border transition-all focus:outline-none`}
-                        >
-                            {category}
-                        </Tab>
-                    ))}
-                </Tab.List>
+                    let matchesPrice = true;
+                    if (priceFilter !== 'all') {
+                        const price = parseFloat(item.price.replace('$', ''));
+                        if (priceFilter === 'under10') matchesPrice = price < 10;
+                        else if (priceFilter === 'under15') matchesPrice = price < 15;
+                        else if (priceFilter === 'over15') matchesPrice = price >= 15;
+                    }
 
-                {/* Panels */}
-                <Tab.Panels>
-                    {Object.values(categories).map((items, idx) => (
-                        <Tab.Panel key={idx} className="focus:outline-none">
-                            <div className="grid sm:grid-cols-2 gap-6">
-                                {items.map(({ title, price, description }) => (
-                                    <div
-                                        key={title}
-                                        className="p-6 bg-gray-50 rounded-xl shadow hover:shadow-lg transition"
-                                    >
-                                        <div className="flex justify-between items-start mb-2">
-                                            <h3 className="text-lg font-semibold text-blue-900">
-                                                {title}
-                                            </h3>
-                                            <span className="font-bold text-blue-700">{price}</span>
+                    return matchesSearch && matchesPrice;
+                });
+
+                if (filteredItems.length > 0) {
+                    filteredSections[section] = filteredItems;
+                }
+            });
+
+            if (Object.keys(filteredSections).length > 0) {
+                filtered[category] = filteredSections;
+            }
+        });
+
+        return filtered;
+    }, [searchTerm, priceFilter]);
+
+    // Get icon for category
+    const getCategoryIcon = (category) => {
+        switch (category) {
+            case 'Breakfast': return Coffee;
+            case 'Lunch': return Utensils;
+            case 'Specials': return Star;
+            case 'Entrees': return Utensils;
+            default: return Coffee;
+        }
+    };
+
+    return (
+        <div className="min-h-screen bg-gray-50">
+            {/* Header */}
+            <div className="bg-blue-900 text-white py-16">
+                <div className="max-w-7xl mx-auto px-4">
+                    <h1 className="text-5xl font-bold text-center mb-4">Our Menu</h1>
+                    <p className="text-xl text-center text-blue-200">Authentic Swedish cuisine since 1945</p>
+                </div>
+            </div>
+
+            {/* Featured Items */}
+            <div className="bg-yellow-400 py-8">
+                <div className="max-w-7xl mx-auto px-4">
+                    <h2 className="text-2xl font-bold text-blue-900 mb-4">Customer Favorites</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {featuredItems.map((item, index) => {
+                            const Icon = item.icon;
+                            return (
+                                <div key={index} className="bg-white rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <div className="flex items-center">
+                                            <Icon className="text-yellow-600 mr-2" size={20} />
+                                            <h3 className="font-bold text-blue-900">{item.title}</h3>
                                         </div>
-                                        {description && (
-                                            <p className="text-sm text-gray-600">{description}</p>
-                                        )}
+                                        <span className="text-blue-700 font-bold">{item.price}</span>
                                     </div>
-                                ))}
+                                    <p className="text-sm text-gray-600">{item.category}</p>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            </div>
+
+            {/* Search and Filter Bar */}
+            <div className="sticky top-0 z-40 bg-white shadow-md">
+                <div className="max-w-7xl mx-auto px-4 py-4">
+                    <div className="flex flex-col md:flex-row gap-4">
+                        <div className="flex-1">
+                            <div className="relative">
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                                <input
+                                    type="text"
+                                    placeholder="Search menu items..."
+                                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
                             </div>
+                        </div>
+                        <div className="flex gap-2">
+                            <div className="relative">
+                                <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                                <select
+                                    className="pl-10 pr-8 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
+                                    value={priceFilter}
+                                    onChange={(e) => setPriceFilter(e.target.value)}
+                                >
+                                    <option value="all">All Prices</option>
+                                    <option value="under10">Under $10</option>
+                                    <option value="under15">Under $15</option>
+                                    <option value="over15">$15 and up</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                            <p className="text-xs mt-8 text-gray-500 text-center">
-                                *Consuming raw or undercooked eggs may increase your risk of foodborne illness.
-                            </p>
-                        </Tab.Panel>
-                    ))}
-                </Tab.Panels>
-            </Tab.Group>
+            <div className="max-w-7xl mx-auto px-4 py-8">
+                <div className="flex flex-col lg:flex-row gap-8">
+                    {/* Category Navigation */}
+                    <div className="lg:w-64">
+                        <div className="sticky top-32">
+                            <h3 className="text-lg font-bold text-gray-900 mb-4">Categories</h3>
+                            <nav className="space-y-2">
+                                {Object.keys(menuData).map((category) => {
+                                    const Icon = getCategoryIcon(category);
+                                    return (
+                                        <button
+                                            key={category}
+                                            onClick={() => setActiveCategory(category)}
+                                            className={`w-full text-left px-4 py-3 rounded-lg flex items-center justify-between transition-all ${
+                                                activeCategory === category
+                                                    ? 'bg-blue-900 text-white shadow-lg'
+                                                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                                            }`}
+                                        >
+                                            <div className="flex items-center">
+                                                <Icon size={20} className="mr-3" />
+                                                <span className="font-medium">{category}</span>
+                                            </div>
+                                            <ChevronRight size={20} className={activeCategory === category ? 'text-yellow-400' : 'text-gray-400'} />
+                                        </button>
+                                    );
+                                })}
+                            </nav>
+
+                            {/* Hours Info */}
+                            <div className="mt-8 bg-blue-100 rounded-lg p-4">
+                                <div className="flex items-center mb-2">
+                                    <Clock className="text-blue-900 mr-2" size={20} />
+                                    <h4 className="font-bold text-blue-900">Hours</h4>
+                                </div>
+                                <p className="text-sm text-blue-800">Daily: 7 AM - 3 PM</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Menu Content */}
+                    <div className="flex-1">
+                        {Object.entries(filteredMenu).map(([category, sections]) => (
+                            <div
+                                key={category}
+                                className={`${activeCategory === category ? 'block' : 'hidden'}`}
+                            >
+                                <div className="mb-8">
+                                    <h2 className="text-3xl font-bold text-gray-900 mb-2">{category}</h2>
+                                    <p className="text-gray-600">
+                                        {category === 'Breakfast' && 'Start your day with our hearty breakfast selections'}
+                                        {category === 'Lunch' && 'Delicious lunch options to satisfy your midday cravings'}
+                                        {category === 'Specials' && 'Chef\'s special creations and seasonal favorites'}
+                                        {category === 'Entrees' && 'Classic Ann Sather entrées made with love'}
+                                    </p>
+                                </div>
+
+                                <div className="space-y-6">
+                                    {Object.entries(sections).map(([section, items]) => (
+                                        <div key={section} className="bg-white rounded-xl shadow-lg overflow-hidden">
+                                            <button
+                                                onClick={() => toggleSection(`${category}-${section}`)}
+                                                className="w-full px-6 py-4 bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 transition-colors"
+                                            >
+                                                <div className="flex items-center justify-between">
+                                                    <h3 className="text-xl font-bold text-blue-900">{section}</h3>
+                                                    <div className="flex items-center">
+                                                        <span className="text-sm text-gray-600 mr-3">{items.length} items</span>
+                                                        <ChevronDown
+                                                            className={`text-blue-900 transform transition-transform ${
+                                                                expandedSections[`${category}-${section}`] ? 'rotate-180' : ''
+                                                            }`}
+                                                            size={24}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </button>
+
+                                            <div className={`transition-all duration-300 ${
+                                                expandedSections[`${category}-${section}`] ? 'max-h-[2000px]' : 'max-h-0'
+                                            } overflow-hidden`}>
+                                                <div className="p-6 space-y-4">
+                                                    {items.map((item, index) => (
+                                                        <div
+                                                            key={index}
+                                                            className="flex justify-between items-start py-3 border-b border-gray-100 last:border-0 hover:bg-gray-50 px-4 -mx-4 rounded-lg transition-colors"
+                                                        >
+                                                            <div className="flex-1">
+                                                                <h4 className="font-semibold text-gray-900 flex items-center">
+                                                                    {item.title}
+                                                                    {item.featured && (
+                                                                        <Star className="ml-2 text-yellow-500" size={16} fill="currentColor" />
+                                                                    )}
+                                                                </h4>
+                                                                {item.description && (
+                                                                    <p className="text-sm text-gray-600 mt-1">{item.description}</p>
+                                                                )}
+                                                            </div>
+                                                            <span className="text-lg font-bold text-blue-700 ml-4">{item.price}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+
+                        {/* No results message */}
+                        {Object.keys(filteredMenu).length === 0 && (
+                            <div className="text-center py-12">
+                                <p className="text-gray-500 text-lg">No menu items found matching your search.</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
         </div>
-    </section>
-);
+    );
+};
 
-export default BreakfastMenu;
+export default CompleteMenu;
