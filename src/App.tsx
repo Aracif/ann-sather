@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { MapPin, Clock, Phone, ChevronDown, Menu, X, Star, Coffee, ShoppingBag, Heart } from 'lucide-react';
-import BreakfastMenu from './menu/breakfast-menu.tsx';
 import CompleteMenu from "./menu/breakfast-menu.tsx";   // adjust the path if the file lives elsewhere
 
 const AnnSatherWebsite = () => {

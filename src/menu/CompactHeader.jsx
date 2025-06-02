@@ -1,20 +1,21 @@
-/* CompactHeader.jsx ---------------------------------------------- */
-import { Search, Filter } from 'lucide-react';
+import React from 'react';
+import { Search, Filter, Sparkles, Star } from 'lucide-react';
 
-export default function CompactHeader({
-                                          featuredItems,
-                                          searchTerm,
-                                          setSearchTerm,
-                                          priceFilter,
-                                          setPriceFilter,
-                                      }) {
+// CompactHeader Component
+const CompactHeader = ({
+                           featuredItems,
+                           searchTerm,
+                           setSearchTerm,
+                           priceFilter,
+                           setPriceFilter,
+                       }) => {
     return (
-        <div className="fixed top-0 inset-x-0 z-50 bg-white/95 backdrop-blur shadow-md">
-            <div className="max-w-7xl mx-auto px-4 py-2 flex items-center gap-4 overflow-x-auto no-scrollbar">
+        <div className="fixed top-0 inset-x-0 z-50 bg-white/95 backdrop-blur shadow-md transition-all duration-300">
+            <div className="max-w-7xl mx-auto px-4 py-2 flex items-center gap-4 overflow-x-auto">
                 {/* mini title */}
                 <span className="text-lg font-semibold text-blue-900 whitespace-nowrap">
-          Our&nbsp;Menu
-        </span>
+                    Our&nbsp;Menu
+                </span>
 
                 {/* favourites as little chips */}
                 <div className="flex items-center gap-2 shrink-0">
@@ -24,7 +25,8 @@ export default function CompactHeader({
                             className="flex items-center bg-blue-50 rounded-full px-3 py-1 text-sm text-blue-900"
                         >
                             <Icon size={14} className="mr-1 text-yellow-500" />
-                            {title}
+                            <span className="hidden sm:inline">{title}</span>
+                            <span className="sm:hidden">{title.split(' ')[0]}</span>
                             <span className="ml-2 font-bold">{price}</span>
                         </div>
                     ))}
@@ -68,4 +70,7 @@ export default function CompactHeader({
             </div>
         </div>
     );
-}
+};
+
+// Add the missing export!
+export default CompactHeader;

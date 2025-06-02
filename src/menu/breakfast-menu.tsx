@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Search, Filter, Coffee, Utensils, Star, ChevronRight, Clock, ChevronDown, Sparkles } from 'lucide-react';
-
+import CompactHeader from '../menu/CompactHeader.jsx';
+// Full menu data from your JSON
 // Full menu data from your JSON
 const menuData = {
     "Breakfast": {
@@ -151,44 +152,41 @@ const CompleteMenu = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [expandedSections, setExpandedSections] = useState({});
     const [priceFilter, setPriceFilter] = useState('all');
+    const [showCompactHeader, setShowCompactHeader] = useState(false);
+
+    const headerRef = useRef(null);
     const menuSectionRef = useRef(null);
 
-    // Handle category change with better scroll handling
+    // Handle scroll to show/hide compact header
+    useEffect(() => {
+        const handleScroll = () => {
+            if (headerRef.current) {
+                const headerTop = headerRef.current.getBoundingClientRect().top;
+                // Show compact header when the main header starts to get covered (top reaches 0 or negative)
+                setShowCompactHeader(headerTop < 0);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    // Handle category change
     const handleCategoryChange = (category) => {
-        // First, update the category
         setActiveCategory(category);
 
-        // Then ensure the menu is visible
+        // Scroll to menu section when category changes
         setTimeout(() => {
-            // Get the menu section element
             const menuSection = menuSectionRef.current;
             if (!menuSection) return;
 
-            // Get current viewport and menu section positions
-            const menuRect = menuSection.getBoundingClientRect();
-            const viewportHeight = window.innerHeight;
+            const offset = showCompactHeader ? 70 : 200;
+            const scrollPosition = menuSection.offsetTop - offset;
 
-            // Check if menu content is below the viewport
-            if (menuRect.top > viewportHeight * 0.5) {
-                // Scroll to put menu section at a comfortable viewing position
-                // Account for sticky elements: nav (~80px) + search bar (~100px)
-                const offset = 200; // Total height of sticky elements
-                const scrollPosition = menuSection.offsetTop - offset;
-
-                window.scrollTo({
-                    top: scrollPosition,
-                    behavior: 'smooth'
-                });
-            } else if (menuRect.bottom < 200) {
-                // If menu bottom is too high, scroll down a bit
-                const offset = 200;
-                const scrollPosition = menuSection.offsetTop - offset;
-
-                window.scrollTo({
-                    top: scrollPosition,
-                    behavior: 'smooth'
-                });
-            }
+            window.scrollTo({
+                top: scrollPosition,
+                behavior: 'smooth'
+            });
         }, 50);
     };
 
@@ -259,78 +257,95 @@ const CompleteMenu = () => {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            {/* Header */}
-            <div className="bg-blue-900 text-white py-16">
-                <div className="max-w-7xl mx-auto px-4">
-                    <h1 className="text-5xl font-bold text-center mb-4">Our Menu</h1>
-                    <p className="text-xl text-center text-blue-200">Authentic Swedish cuisine since 1945</p>
-                </div>
-            </div>
+            {/* Compact Header - Shows when main header is scrolled out */}
+            {showCompactHeader && (
+                <CompactHeader
+                    featuredItems={featuredItems}
+                    searchTerm={searchTerm}
+                    setSearchTerm={setSearchTerm}
+                    priceFilter={priceFilter}
+                    setPriceFilter={setPriceFilter}
+                />
+            )}
 
-            {/* Featured Items */}
-            <div className="bg-yellow-400 py-8">
-                <div className="max-w-7xl mx-auto px-4">
-                    <h2 className="text-2xl font-bold text-blue-900 mb-4">Customer Favorites</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {featuredItems.map((item, index) => {
-                            const Icon = item.icon;
-                            return (
-                                <div key={index} className="bg-white rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow">
-                                    <div className="flex items-center justify-between mb-2">
-                                        <div className="flex items-center">
-                                            <Icon className="text-yellow-600 mr-2" size={20} />
-                                            <h3 className="font-bold text-blue-900">{item.title}</h3>
-                                        </div>
-                                        <span className="text-blue-700 font-bold">{item.price}</span>
-                                    </div>
-                                    <p className="text-sm text-gray-600">{item.category}</p>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            </div>
-
-            <div className="max-w-7xl mx-auto px-4">
-                {/* Search and Filter Bar - Sticky with proper offset */}
-                <div className="sticky top-24 lg:top-9 z-30 bg-gray-50 pt-8 pb-4">
-                    <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200">
-                        <div className="flex flex-col md:flex-row gap-4">
-                            <div className="flex-1">
-                                <div className="relative">
-                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                                    <input
-                                        type="text"
-                                        placeholder="Search menu items..."
-                                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                    />
-                                </div>
+            {/* Main Header Section */}
+            <div ref={headerRef}>
+                {/* Combined Header */}
+                <div className="bg-blue-900 text-white py-12">
+                    <div className="max-w-7xl mx-auto px-4">
+                        <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+                            {/* Title Section */}
+                            <div className="text-center lg:text-left">
+                                <h1 className="text-5xl font-bold mb-2">Our Menu</h1>
+                                <p className="text-xl text-blue-200">Authentic Swedish cuisine since 1945</p>
                             </div>
-                            <div className="flex gap-2">
-                                <div className="relative">
-                                    <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                                    <select
-                                        className="pl-10 pr-8 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
-                                        value={priceFilter}
-                                        onChange={(e) => setPriceFilter(e.target.value)}
-                                    >
-                                        <option value="all">All Prices</option>
-                                        <option value="under10">Under $10</option>
-                                        <option value="under15">Under $15</option>
-                                        <option value="over15">$15 and up</option>
-                                    </select>
+
+                            {/* Customer Favorites */}
+                            <div className="w-full lg:w-auto">
+                                <h2 className="text-xl font-semibold text-yellow-400 mb-3 text-center lg:text-left">Customer Favorites</h2>
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                    {featuredItems.map((item, index) => {
+                                        const Icon = item.icon;
+                                        return (
+                                            <div key={index} className="bg-white/10 backdrop-blur rounded-lg px-4 py-3 flex items-center justify-between hover:bg-white/20 transition-colors">
+                                                <div className="flex items-center">
+                                                    <Icon className="text-yellow-400 mr-2" size={18} />
+                                                    <span className="font-medium text-white">{item.title}</span>
+                                                </div>
+                                                <span className="text-yellow-400 font-bold ml-2">{item.price}</span>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="flex flex-col lg:flex-row gap-8 pb-8" ref={menuSectionRef} style={{ scrollMarginTop: '200px' }}>
+                {/* Search and Filter Bar */}
+                <div className="bg-gray-50 py-8">
+                    <div className="max-w-7xl mx-auto px-4">
+                        <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200 mb-8">
+                            <div className="flex flex-col md:flex-row gap-4">
+                                <div className="flex-1">
+                                    <div className="relative">
+                                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                                        <input
+                                            type="text"
+                                            placeholder="Search menu items..."
+                                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="flex gap-2">
+                                    <div className="relative">
+                                        <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                                        <select
+                                            className="pl-10 pr-8 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
+                                            value={priceFilter}
+                                            onChange={(e) => setPriceFilter(e.target.value)}
+                                        >
+                                            <option value="all">All Prices</option>
+                                            <option value="under10">Under $10</option>
+                                            <option value="under15">Under $15</option>
+                                            <option value="over15">$15 and up</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Menu Content */}
+            <div className={`max-w-7xl mx-auto px-4 ${showCompactHeader ? 'pt-20' : ''}`}>
+                <div className="flex flex-col lg:flex-row gap-8 pb-8" ref={menuSectionRef}>
                     {/* Category Navigation */}
                     <div className="lg:w-64">
-                        <div className="sticky top-64 lg:top-72">
+                        <div className={`sticky ${showCompactHeader ? 'top-20' : 'top-8'}`}>
                             <h3 className="text-lg font-bold text-gray-900 mb-4">Categories</h3>
                             <nav className="space-y-2">
                                 {Object.keys(menuData).map((category) => {
