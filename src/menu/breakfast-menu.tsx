@@ -1,8 +1,8 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Search, Filter, Coffee, Utensils, Star, ChevronRight, Clock, ChevronDown, Sparkles } from 'lucide-react';
 import CompactHeader from '../menu/CompactHeader.jsx';
-// Full menu data from your JSON
-// Full menu data from your JSON
+
+// Menu data (keeping the same)
 const menuData = {
     "Breakfast": {
         "EGGS BENEDICT": [
@@ -153,23 +153,57 @@ const CompleteMenu = () => {
     const [expandedSections, setExpandedSections] = useState({});
     const [priceFilter, setPriceFilter] = useState('all');
     const [showCompactHeader, setShowCompactHeader] = useState(false);
+    const [navHeight, setNavHeight] = useState(80); // Default nav height
 
     const headerRef = useRef(null);
     const menuSectionRef = useRef(null);
+    const menuContainerRef = useRef(null);
 
-    // Handle scroll to show/hide compact header
+    // Calculate main nav height dynamically
     useEffect(() => {
-        const handleScroll = () => {
-            if (headerRef.current) {
-                const headerTop = headerRef.current.getBoundingClientRect().top;
-                // Show compact header when the main header starts to get covered (top reaches 0 or negative)
-                setShowCompactHeader(headerTop < 0);
+        const updateNavHeight = () => {
+            const mainNav = document.querySelector('nav');
+            if (mainNav) {
+                setNavHeight(mainNav.offsetHeight);
             }
         };
 
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
+        updateNavHeight();
+        window.addEventListener('resize', updateNavHeight);
+        return () => window.removeEventListener('resize', updateNavHeight);
     }, []);
+
+    // Handle scroll to show/hide compact header ONLY within menu section
+    useEffect(() => {
+        const handleScroll = () => {
+            if (!headerRef.current || !menuContainerRef.current) return;
+
+            const menuContainer = menuContainerRef.current;
+            const header = headerRef.current;
+
+            // Get positions
+            const menuRect = menuContainer.getBoundingClientRect();
+            const headerRect = header.getBoundingClientRect();
+            const scrollY = window.scrollY;
+
+            // Check if we're within the menu section
+            const menuTop = menuRect.top + scrollY;
+            const menuBottom = menuTop + menuRect.height;
+            const isInMenuSection = scrollY >= menuTop - navHeight && scrollY <= menuBottom;
+
+            // Show compact header only when:
+            // 1. We're in the menu section
+            // 2. The menu header is scrolled out of view
+            const shouldShowCompact = isInMenuSection && headerRect.bottom <= navHeight;
+
+            setShowCompactHeader(shouldShowCompact);
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        handleScroll(); // Check initial state
+
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [navHeight]);
 
     // Handle category change
     const handleCategoryChange = (category) => {
@@ -180,7 +214,7 @@ const CompleteMenu = () => {
             const menuSection = menuSectionRef.current;
             if (!menuSection) return;
 
-            const offset = showCompactHeader ? 70 : 200;
+            const offset = showCompactHeader ? navHeight + 70 : navHeight + 200;
             const scrollPosition = menuSection.offsetTop - offset;
 
             window.scrollTo({
@@ -256,16 +290,18 @@ const CompleteMenu = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50" ref={menuContainerRef}>
             {/* Compact Header - Shows when main header is scrolled out */}
             {showCompactHeader && (
-                <CompactHeader
-                    featuredItems={featuredItems}
-                    searchTerm={searchTerm}
-                    setSearchTerm={setSearchTerm}
-                    priceFilter={priceFilter}
-                    setPriceFilter={setPriceFilter}
-                />
+                <div style={{ top: `${navHeight}px` }} className="fixed inset-x-0 z-40">
+                    <CompactHeader
+                        featuredItems={featuredItems}
+                        searchTerm={searchTerm}
+                        setSearchTerm={setSearchTerm}
+                        priceFilter={priceFilter}
+                        setPriceFilter={setPriceFilter}
+                    />
+                </div>
             )}
 
             {/* Main Header Section */}
@@ -345,7 +381,7 @@ const CompleteMenu = () => {
                 <div className="flex flex-col lg:flex-row gap-8 pb-8" ref={menuSectionRef}>
                     {/* Category Navigation */}
                     <div className="lg:w-64">
-                        <div className={`sticky ${showCompactHeader ? 'top-20' : 'top-8'}`}>
+                        <div className={`sticky ${showCompactHeader ? `top-${navHeight + 70}` : 'top-8'}`} style={{ top: showCompactHeader ? `${navHeight + 70}px` : '32px' }}>
                             <h3 className="text-lg font-bold text-gray-900 mb-4">Categories</h3>
                             <nav className="space-y-2">
                                 {Object.keys(menuData).map((category) => {
