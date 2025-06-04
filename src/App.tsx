@@ -31,6 +31,7 @@ const AnnSatherWebsite = () => {
             icon: ShoppingBag,
             color: 'hover:bg-orange-500/20',
             links: {
+                // Belmont: 'https://www.grubhub.com/restaurant/ann-sather-west-belmont-avenue/2039220', // need correct link
                 Broadway: 'https://www.grubhub.com/restaurant/ann-sather-3415-n-broadway-chicago/2039221',
                 Granville: 'https://www.grubhub.com/restaurant/ann-sather-restaurant-1147-w-granville-ave-chicago/2039122'
             }
@@ -40,7 +41,9 @@ const AnnSatherWebsite = () => {
             icon: ShoppingBag,
             color: 'hover:bg-red-500/20',
             links: {
-                Belmont: 'https://www.doordash.com/store/ann-sather-chicago-3142/'
+                Belmont: 'https://www.doordash.com/store/ann-sather-chicago-3142/1073483/',
+                // Broadway: 'https://www.doordash.com/store/ann-sather-chicago-3142/1073483/', // need correct link
+                // Granville: 'https://www.doordash.com/store/ann-sather-chicago-3142/1073483/' // need correct link
             }
         },
         {
@@ -48,7 +51,9 @@ const AnnSatherWebsite = () => {
             icon: ShoppingBag,
             color: 'hover:bg-blue-500/20',
             links: {
-                Broadway: 'https://postmates.com/store/ann-sather-broadway/_rqbqrenQPOb9u-BdcIkcw'
+                Belmont: 'https://postmates.com/store/ann-sather-west-belmont-avenue/cV9GAHZBT7mgtHKW9q_VXQ',
+                Broadway: 'https://postmates.com/store/ann-sather-broadway/_rqbqrenQPOb9u-BdcIkcw',
+                Granville: 'https://postmates.com/store/ann-sather-grandview/cugx4fjvRO6f8Ed8Kkrx8Q'
             }
         }
     ];
