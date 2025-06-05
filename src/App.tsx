@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MapPin, Clock, Phone, ChevronDown, Menu, X, Star, Coffee, ShoppingBag, Heart } from 'lucide-react';
 import CompleteMenu from "./menu/breakfast-menu.tsx";   // adjust the path if the file lives elsewhere
+import AboutUs from './components/AboutUs';
 
 const AnnSatherWebsite = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -154,8 +155,7 @@ const AnnSatherWebsite = () => {
                         {/* Desktop Navigation */}
                         <div className="hidden md:flex space-x-8 items-center">
                             {['Menu', 'Locations', 'Order Online', 'About'].map((item) => (
-                                <a
-                                    key={item}
+                                <a key={item}
                                     href={`#${item.toLowerCase().replace(' ', '-')}`}
                                     className={`font-medium transition-colors duration-300 hover:text-yellow-400 ${
                                         scrolled ? 'text-gray-700 hover:text-blue-600' : 'text-white'
@@ -175,6 +175,8 @@ const AnnSatherWebsite = () => {
                                 Order Now
                             </a>
                         </div>
+
+
 
                         {/* Mobile menu button */}
                         <button
@@ -421,6 +423,9 @@ const AnnSatherWebsite = () => {
                     </div>
                 </div>
             </section>
+
+            {/* The AboutUs component*/}
+            <AboutUs />
 
             {/* Footer */}
             <footer className="bg-gray-900 text-white py-12">

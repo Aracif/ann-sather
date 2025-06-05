@@ -107,7 +107,7 @@ const menuData = {
             { title: "Southwest Chicken Salad", price: "$15.95" },
             { title: "Fresh Fruit and Chicken Salad", price: "$14.95" },
             { title: "Grilled Chicken Breast Salad", price: "$15.95" },
-            { title: "Caesar Tortllini Salad", price: "$14.95" }
+            { title: "Caesar Tortellini Salad", price: "$14.95" }
         ]
     },
     "Specials": {
