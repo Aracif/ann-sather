@@ -183,7 +183,7 @@ const CompleteMenu = () => {
             // Show compact header only when:
             // 1. We're in the menu section
             // 2. The menu header is scrolled out of view
-            const shouldShowCompact = isInMenuSection && headerRect.bottom <= SCROLLED_NAV_HEIGHT;
+            const shouldShowCompact = isInMenuSection;
 
             setShowCompactHeader(shouldShowCompact);
         };
