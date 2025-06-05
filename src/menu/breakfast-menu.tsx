@@ -375,7 +375,7 @@ const CompleteMenu = () => {
             </div>
 
             {/* Menu Content */}
-            <div className={`max-w-7xl mx-auto px-4 transition-all duration-300 pt-4 ${showCompactHeader ? 'pt-16' : 'pt-0'}`}>
+            <div className={`max-w-7xl mx-auto px-18 transition-all duration-300 pt-4 ${showCompactHeader ? 'pt-16' : 'pt-0'}`}>
                 <div className="flex flex-col lg:flex-row gap-8 pb-8" ref={menuSectionRef}>
                     {/* Category Navigation */}
                     <div className="lg:w-64">
