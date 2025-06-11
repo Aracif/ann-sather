@@ -119,10 +119,15 @@ const AnnSatherWebsite = () => {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center">
                         <div className="flex items-center">
+
                             {/* Logo - using the actual logo image */}
                             <div className="flex items-center">
+                                <button
+                                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                                    className="focus:outline-none cursor-pointer"
+                                >
                                 <img
-                                    src="/logo_home1.png"
+                                    src="/src/assets/images/AnnSather-Logo_img.png"
                                     alt="Ann Sather Restaurant"
                                     className={`h-16 w-auto transition-all duration-300 ${
                                         scrolled ? 'h-12' : 'h-16'
@@ -132,8 +137,8 @@ const AnnSatherWebsite = () => {
                                         e.target.nextSibling.style.display = 'flex';
                                     }}
                                 />
-                                <div
-                                    className="hidden items-center"
+                                </button>
+                                <div className="hidden items-center"
                                     style={{ display: 'none' }}
                                 >
                                     <div className="flex flex-col">
