@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MapPin, Clock, Phone, ChevronDown, Menu, X, Star, Coffee, ShoppingBag, Heart } from 'lucide-react';
 import CompleteMenu from "./menu/breakfast-menu.tsx";   // adjust the path if the file lives elsewhere
 import AboutUs from './components/AboutUs';
+import Catering from "./components/Catering.tsx";
 
 const AnnSatherWebsite = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -121,8 +122,12 @@ const AnnSatherWebsite = () => {
                         <div className="flex items-center">
                             {/* Logo - using the actual logo image */}
                             <div className="flex items-center">
+                                <button
+                                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                                    className="focus:outline-none cursor-pointer"
+                                    >
                                 <img
-                                    src="/logo_home1.png"
+                                    src="/src/assets/images/AnnSather-Logo_img.png"
                                     alt="Ann Sather Restaurant"
                                     className={`h-16 w-auto transition-all duration-300 ${
                                         scrolled ? 'h-12' : 'h-16'
@@ -132,8 +137,8 @@ const AnnSatherWebsite = () => {
                                         e.target.nextSibling.style.display = 'flex';
                                     }}
                                 />
-                                <div
-                                    className="hidden items-center"
+                                </button>
+                                <div className="hidden items-center"
                                     style={{ display: 'none' }}
                                 >
                                     <div className="flex flex-col">
@@ -154,7 +159,7 @@ const AnnSatherWebsite = () => {
 
                         {/* Desktop Navigation */}
                         <div className="hidden md:flex space-x-8 items-center">
-                            {['Menu', 'Locations', 'Order Online', 'About'].map((item) => (
+                            {['Menu', 'Catering', 'Locations', 'Order Online', 'About'].map((item) => (
                                 <a key={item}
                                     href={`#${item.toLowerCase().replace(' ', '-')}`}
                                     className={`font-medium transition-colors duration-300 hover:text-yellow-400 ${
@@ -195,7 +200,7 @@ const AnnSatherWebsite = () => {
                     isMenuOpen ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'
                 }`} style={{ top: '100%' }}>
                     <div className="px-4 py-6 space-y-4">
-                        {['Menu', 'Locations', 'Order Online', 'About'].map((item) => (
+                        {['Menu', 'Catering', 'Locations', 'Order Online', 'About'].map((item) => (
                             <a
                                 key={item}
                                 href={`#${item.toLowerCase().replace(' ', '-')}`}
@@ -310,6 +315,9 @@ const AnnSatherWebsite = () => {
             </section>
 
             <CompleteMenu />   {/* new tabbed breakfast menu */}
+
+            {/* Catering Component */}
+            <Catering />
             
             {/* Locations */}
             <section id="locations" className="py-20">
