@@ -159,7 +159,7 @@ const AnnSatherWebsite = () => {
 
                         {/* Desktop Navigation */}
                         <div className="hidden md:flex space-x-8 items-center">
-                            {['Menu', 'Catering', 'Locations', 'Order Online', 'About'].map((item) => (
+                            {['Menu', 'Catering', 'Locations', 'Recipes', 'About Us', 'Contact'].map((item) => (
                                 <a key={item}
                                     href={`#${item.toLowerCase().replace(' ', '-')}`}
                                     className={`font-medium transition-colors duration-300 hover:text-yellow-400 ${
@@ -200,7 +200,7 @@ const AnnSatherWebsite = () => {
                     isMenuOpen ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'
                 }`} style={{ top: '100%' }}>
                     <div className="px-4 py-6 space-y-4">
-                        {['Menu', 'Catering', 'Locations', 'Order Online', 'About'].map((item) => (
+                        {['Menu', 'Catering', 'Locations', 'Recipes', 'About Us', 'Contact'].map((item) => (
                             <a
                                 key={item}
                                 href={`#${item.toLowerCase().replace(' ', '-')}`}

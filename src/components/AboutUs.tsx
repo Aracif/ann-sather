@@ -31,7 +31,7 @@ const AboutUs: React.FC = () => {
 
     // Auto-expand if navigated via #about
     useEffect(() => {
-        if (window.location.hash === '#about') {
+        if (window.location.hash === '#about-us') {
             setIsExpanded(false);
             sectionRef.current?.scrollIntoView({ behavior: 'smooth' });
         }
@@ -41,15 +41,23 @@ const AboutUs: React.FC = () => {
 
     return (
         <section
-            id="about"
+            id="about-us"
             ref={sectionRef}
             className={`bg-white text-gray-800 px-6 py-14 max-w-5xl mx-auto transition-opacity duration-1000 ease-out ${
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4' }`} >
-            <h3 className="text-3xl sm:text-2xl font-bold pt-10 text-center text-blue-900 mb-6 indent-8 leading-relaxed px-4">
-                About Ann Sather Restaurants and Catering
-            </h3>
 
-            <p className="text-lg leading-relaxed text-center max-w-3xl mx-auto mb-8">
+
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-blue-900 pt-10 mb-6 leading-relaxed px-4">
+                About Ann Sather Restaurants and Catering
+            </h2>
+            <div className="flex justify-center pb-4">
+                <img
+                    src="/src/assets/images/ann_sather_photo_cropped.jpg"
+                    alt="About our restaurant"
+                    className="w-20 h-auto rounded-sm"
+                />
+            </div>
+            <p className="text-lg leading-relaxed text-center max-w-3xl mx-auto mb-4">
                 Yes, there really was an Ann Sather.
             </p>
 

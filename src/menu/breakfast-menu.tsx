@@ -227,7 +227,7 @@ const CompleteMenu = () => {
         if (firstSection) {
             setExpandedSections(prev => ({
                 ...prev,
-                [`${activeCategory}-${firstSection}`]: true
+                [`${activeCategory}-${firstSection}`]: false
             }));
         }
     }, [activeCategory]);
