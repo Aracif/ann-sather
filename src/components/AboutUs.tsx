@@ -71,7 +71,7 @@ const AboutUs: React.FC = () => {
             {/* Collapsible Content */}
             <div
                 className={`transition-all duration-700 ease-in-out overflow-hidden ${
-                    isExpanded ? 'max-h-screen' : 'max-h-0'
+                    isExpanded ? 'max-h-[300p0x]' : 'max-h-0'
                 }`}
             >
 
@@ -144,10 +144,10 @@ const AboutUs: React.FC = () => {
             </div>
 
             {/* Toggle Button */}
-            <div className="text-center mt-6 pl-4">
+            <div className="flex justify-center items-center text-center mt-6">
                 <button
                     onClick={toggleExpanded}
-                    className="flex items-center justify-center gap-2 text-blue-700 hover:text-blue-900 transition-colors"
+                    className="flex items-center justify-center gap-2 text-blue-700 hover:text-blue-900 cursor-pointer transition-colors"
                 >
                     {isExpanded ? (
                         <>

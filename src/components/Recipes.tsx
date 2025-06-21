@@ -40,8 +40,8 @@ const Recipes = () => {
 
     return (
         <section
-            ref={sectionRef}
             id="recipes"
+            ref={sectionRef}
             className={`bg-blue-100 text-gray-800 px-6 py-14 max-w-7xl mx-auto transition-opacity duration-1000 ease-out ${
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4' }`} >
 
@@ -50,18 +50,40 @@ const Recipes = () => {
                 Cooking at Home with Ann Sather
             </h2>
 
+            <p className={"max-w-5xl mx-auto text-gray-700 text-justify leading-relaxed px-4"}>
+                Do you think it’s possible to replicate our much celebrated cinnamon rolls,
+                Swedish pancakes, roast duck or one of our delectable pies at home?
+                We don’t think so, either, but we are giving you the opportunity to try.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 m-10 px-4 max-w-6xl mx-auto">
+                {[
+                    { title: 'Breakfast', link: 'pdfs/' },
+                    { title: 'Starters', link: 'pdfs/'},
+                    { title: 'Sides', link: 'pdfs/'},
+                    { title: 'Entrees', link: 'pdfs/'},
+                    { title: 'Desserts', link: 'pdfs/'},
+                ].map(({ title, link }) => (
+                    <a
+                        key={title}
+                        href={link}
+                        target={'_blank'}
+                    rel={'noopener noreferrer'}
+                    className={"bg-white text-blue-900 rounded-xl shadow-md hover:shadow-lg p-6 text-center font-semibold transition hover:bg-blue-50"}
+                    >
+                        {title}
+                    </a>
+                ))}
+
+            </div>
             {/* Collapsible Content */}
             <div
                 className={`transition-all duration-700 ease-in-out overflow-hidden ${
                     isExpanded ? 'max-h-screen' : 'max-h-0'
                 }`}
             >
-                <p className={"max-w-5xl mx-auto text-gray-700 text-justify leading-relaxed px-4"}>
-                    Do you think it’s possible to replicate our much celebrated cinnamon rolls,
-                    Swedish pancakes, roast duck or one of our delectable pies at home?
-                    We don’t think so, either, but we are giving you the opportunity to try.
-                </p>
-                <br/>
+
+                {/*<br/>*/}
                 <p className={"max-w-5xl mx-auto text-gray-700 text-justify leading-relaxed px-4"}>
 
                     In 1994, Ann Sather’s restaurants published a 50th anniversary cookbook.
@@ -69,16 +91,17 @@ const Recipes = () => {
                     available online. Download the recipes for your favorite menu items below and
                     get cooking!
                 </p>
+                {/*<br/>*/}
                 <p className={"max-w-5xl mx-auto text-gray-700 text-justify leading-relaxed px-4"}>
                     Click on any of the following categories to download the mouth watering recipe of your choice.
                 </p>
             </div>
 
                 {/* Toggle Button */}
-                <div className="text-center mt-6 pl-4">
+                <div className="flex justify-center items-center text-center mt-6">
                     <button
                         onClick={toggleExpanded}
-                        className="flex items-center justify-center gap-2 text-blue-700 hover:text-blue-900 transition-colors"
+                        className="flex items-center justify-center gap-2 text-blue-700 hover:text-blue-900 cursor-pointer transition-colors"
                     >
                         {isExpanded ? (
                             <>
