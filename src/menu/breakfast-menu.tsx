@@ -159,7 +159,7 @@ const CompleteMenu = () => {
     const menuContainerRef = useRef(null);
 
     // Use fixed heights for nav states
-    const SCROLLED_NAV_HEIGHT = 64; // Height when nav is scrolled
+    const SCROLLED_NAV_HEIGHT = 80; // Height when nav is scrolled
     const COMPACT_HEADER_HEIGHT = 56; // Height of compact header
 
     // Handle scroll to show/hide compact header ONLY within menu section
@@ -382,7 +382,7 @@ const CompleteMenu = () => {
                         <div
                             className="sticky transition-all duration-300"
                             style={{
-                                top: showCompactHeader ? `${SCROLLED_NAV_HEIGHT + COMPACT_HEADER_HEIGHT + 8}px` : '32px',
+                                top: showCompactHeader ? `${SCROLLED_NAV_HEIGHT + COMPACT_HEADER_HEIGHT + 14}px` : '32px',
                                 transition: 'top 0.3s ease-in-out'
                             }}>
                             <h3 className="text-lg font-bold text-gray-900 mb-4">Categories</h3>

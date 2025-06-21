@@ -306,12 +306,12 @@ const AnnSatherWebsite = () => {
                         ))}
                     </div>
 
-                    <div className="text-center mt-12">
-                        <a href="#" className="inline-flex items-center text-blue-600 font-semibold hover:text-blue-700 transition-colors">
-                            View Full Menu
-                            <ChevronDown size={20} className="ml-2 transform -rotate-90" />
-                        </a>
-                    </div>
+                    {/*<div className="text-center mt-12">*/}
+                    {/*    <a href="#" className="inline-flex items-center text-blue-600 font-semibold hover:text-blue-700 transition-colors">*/}
+                    {/*        View Full Menu*/}
+                    {/*        <ChevronDown size={20} className="ml-2 transform -rotate-90" />*/}
+                    {/*    </a>*/}
+                    {/*</div>*/}
                 </div>
             </section>
 
