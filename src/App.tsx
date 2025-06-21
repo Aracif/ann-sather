@@ -1,9 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, Clock, Phone, ChevronDown, Menu, X, Star, Coffee, ShoppingBag, Heart } from 'lucide-react';
+import {
+    MapPin,
+    Clock,
+    Phone,
+    ChevronDown,
+    Menu,
+    X,
+    Star,
+    Coffee,
+    ShoppingBag,
+    Heart,
+} from 'lucide-react';
 import CompleteMenu from "./menu/breakfast-menu.tsx";   // adjust the path if the file lives elsewhere
 import AboutUs from './components/AboutUs';
 import Catering from "./components/Catering.tsx";
 import Recipes from "./components/Recipes.tsx";
+import AdminPage from "./components/cms/admin-page.tsx";
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 
 const AnnSatherWebsite = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -477,4 +490,29 @@ const AnnSatherWebsite = () => {
     );
 };
 
-export default AnnSatherWebsite;
+
+//--- App Component (Router) ---
+export default function App() {
+    // This simple router reads the URL path to determine which page to show.
+    // It avoids the need for react-router-dom, which was causing issues.
+    const [path, setPath] = useState(window.location.pathname);
+
+    // This effect handles browser back/forward navigation.
+    useEffect(() => {
+        const onLocationChange = () => {
+            setPath(window.location.pathname);
+        };
+        window.addEventListener('popstate', onLocationChange);
+        return () => {
+            window.removeEventListener('popstate', onLocationChange);
+        };
+    }, []);
+
+    // Render the component based on the path.
+    // In the preview environment, you may need to manually add /admin to the URL.
+    if (path.endsWith('/admin')) {
+        return <AdminPage />;
+    }
+
+    return <AnnSatherWebsite />;
+}
