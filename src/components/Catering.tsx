@@ -54,6 +54,29 @@ const CateringSection = () => {
         }
     }, [openSection]);
 
+    // Add a global click listener to close the open accordion if clicked outside of it
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            // If no section is open, do nothing
+            if (!openSection) return;
+
+            // Get the ref of the currently open section
+            const currentRef = sectionRefs[openSection]?.current;
+
+            // If click is outside the current open section, close it
+            if (currentRef && !currentRef.contains(event.target as Node)) {
+                setOpenSection(null);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [openSection]);
+
+
     const renderAccordion = (
         id: keyof typeof sectionRefs,
         title: string,
@@ -65,8 +88,7 @@ const CateringSection = () => {
         >
             <button
                 onClick={() => setOpenSection((prev) => (prev === id ? null : id))}
-                // className="w-full px-6 py-4 bg-white hover:bg-blue-100 text-blue-900 font-bold transition-colors flex items-center justify-between cursor-pointer"
-                className="w-full px-6 py-4 bg-yellow-400/10 hover:bg-white/40 text-white font-bold transition-colors flex items-center justify-between cursor-pointer"
+                className="w-full px-6 py-4 bg-white-100 hover:bg-white/20 text-white font-bold transition-colors flex items-center justify-between cursor-pointer"
 
             >
                 <h3 className="text-xl font-bold uppercase">{title}</h3>
@@ -93,22 +115,22 @@ const CateringSection = () => {
 
             {/* Foreground content */}
             <div className="relative z-10">
-                <h3 className="text-4xl font-bold text-center mb-6">Ann Sather Catering</h3>
+                <h3 className="text-4xl font-bold text-center mb-8">Ann Sather Catering</h3>
 
                 <div className="mb-10 text-center">
                     <button
                         onClick={() => setShowDeliveryInfo(!showDeliveryInfo)}
-                        className="bg-white/20 backdrop-blur text-white font-semibold px-4 py-2 rounded-full shadow hover:bg-white/40 transition cursor-pointer"
+                        className="bg-white/10 text-white font-semibold px-4 py-2 rounded-full shadow hover:bg-white/40 transition cursor-pointer"
                     >
                         {showDeliveryInfo ? 'Hide Delivery Info' : 'View Delivery Info'}
                     </button>
                 </div>
 
                 {showDeliveryInfo && (
-                    <div className="bg-white text-blue-900 rounded-xl shadow-lg p-6 max-w-4xl mx-auto mb-10 text-sm">
+                    <div className="bg-white text-blue-900 rounded-xl shadow-lg p-6 max-w-3xl mx-auto mb-10 text-sm">
                         <h4 className="text-lg font-bold">Deliveries</h4>
                         <p>To place a catering delivery order, please call: <strong>773-348-2378</strong>.</p>
-                        <p>We ask that you give us 24-hour notice to ensure availability. Orders for next day must be placed by <strong>2 p.m.</strong></p>
+                        <p>We ask that you give us <strong>24-hour notice</strong> to ensure availability. Orders for next day must be placed by <strong>2 p.m.</strong></p>
                         <p>Deliveries are for groups of <strong>10 or more</strong>.</p>
                         <p><strong>Delivery Charges:</strong></p>
                         <ul className="list-disc ml-5">

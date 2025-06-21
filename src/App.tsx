@@ -469,7 +469,7 @@ const AnnSatherWebsite = () => {
                     </div>
 
                     <div className="mt-12 pt-8 border-t border-gray-800 text-center opacity-60">
-                        <p>&copy; 2024 Ann Sather Restaurant. All rights reserved.</p>
+                        <p>&copy; 2025 Ann Sather Restaurant. All rights reserved.</p>
                     </div>
                 </div>
             </footer>
