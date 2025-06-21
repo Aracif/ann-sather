@@ -152,65 +152,37 @@ const CompleteMenu = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [expandedSections, setExpandedSections] = useState({});
     const [priceFilter, setPriceFilter] = useState('all');
-    const [showCompactHeader, setShowCompactHeader] = useState(false);
 
-    const headerRef = useRef(null);
     const menuSectionRef = useRef(null);
-    const menuContainerRef = useRef(null);
+    const headerRef = useRef(null);
 
-    // Use fixed heights for nav states
-    const SCROLLED_NAV_HEIGHT = 80; // Height when nav is scrolled
-    const COMPACT_HEADER_HEIGHT = 56; // Height of compact header
+    // This is the assumed height of a global navigation bar, if any.
+    // The sticky header will stick below this.
+    const TOP_NAV_HEIGHT = 80; // Set to your global nav height, e.g., 80
 
-    // Handle scroll to show/hide compact header ONLY within menu section
+    const [headerHeight, setHeaderHeight] = useState(0);
+
+    // Measure header height
     useEffect(() => {
-        const handleScroll = () => {
-            if (!headerRef.current || !menuContainerRef.current) return;
+        if (headerRef.current) {
+            setHeaderHeight(headerRef.current.offsetHeight);
+        }
+    }, [searchTerm, priceFilter]); // Re-calculate if content changes
 
-            const menuContainer = menuContainerRef.current;
-            const header = headerRef.current;
-
-            // Get positions
-            const menuRect = menuContainer.getBoundingClientRect();
-            const headerRect = header.getBoundingClientRect();
-            const scrollY = window.scrollY;
-
-            // Check if we're within the menu section
-            const menuTop = menuRect.top + scrollY;
-            const menuBottom = menuTop + menuRect.height;
-            const isInMenuSection = scrollY >= menuTop - SCROLLED_NAV_HEIGHT && scrollY <= menuBottom;
-
-            // Show compact header only when:
-            // 1. We're in the menu section
-            // 2. The menu header is scrolled out of view
-            const shouldShowCompact = isInMenuSection;
-
-            setShowCompactHeader(shouldShowCompact);
-        };
-
-        window.addEventListener('scroll', handleScroll);
-        handleScroll(); // Check initial state
-
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
-
-    // Handle category change
+    // Handle category change and scroll to the top of the menu section
     const handleCategoryChange = (category) => {
         setActiveCategory(category);
 
-        // Scroll to menu section when category changes
-        setTimeout(() => {
-            const menuSection = menuSectionRef.current;
-            if (!menuSection) return;
+        const menuSection = menuSectionRef.current;
+        if (!menuSection) return;
 
-            const offset = showCompactHeader ? SCROLLED_NAV_HEIGHT + COMPACT_HEADER_HEIGHT + 20 : SCROLLED_NAV_HEIGHT + 200;
-            const scrollPosition = menuSection.offsetTop - offset;
+        // Scroll to the top of the menu container, accounting for the sticky header
+        const scrollPosition = menuSection.offsetTop - headerHeight - TOP_NAV_HEIGHT;
 
-            window.scrollTo({
-                top: scrollPosition,
-                behavior: 'smooth'
-            });
-        }, 50);
+        window.scrollTo({
+            top: scrollPosition,
+            behavior: 'smooth'
+        });
     };
 
     // Toggle section expansion
@@ -221,28 +193,27 @@ const CompleteMenu = () => {
         }));
     };
 
-    // Auto-expand first section of active category
+    // Auto-expand first section of active category on change
     useEffect(() => {
-        const firstSection = Object.keys(menuData[activeCategory])[0];
-        if (firstSection) {
-            setExpandedSections(prev => ({
-                ...prev,
-                [`${activeCategory}-${firstSection}`]: false
-            }));
+        if (filteredMenu[activeCategory]) {
+            const firstSection = Object.keys(filteredMenu[activeCategory])[0];
+            if (firstSection) {
+                setExpandedSections(prev => ({
+                    // ...prev, // Uncomment to keep other sections open
+                    [`${activeCategory}-${firstSection}`]: true
+                }));
+            }
         }
     }, [activeCategory]);
 
     // Filter menu items based on search and price
     const filteredMenu = useMemo(() => {
         const filtered = {};
-
         Object.entries(menuData).forEach(([category, sections]) => {
             const filteredSections = {};
-
             Object.entries(sections).forEach(([section, items]) => {
                 const filteredItems = items.filter(item => {
                     const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase());
-
                     let matchesPrice = true;
                     if (priceFilter !== 'all') {
                         const price = parseFloat(item.price.replace('$', ''));
@@ -250,20 +221,16 @@ const CompleteMenu = () => {
                         else if (priceFilter === 'under15') matchesPrice = price < 15;
                         else if (priceFilter === 'over15') matchesPrice = price >= 15;
                     }
-
                     return matchesSearch && matchesPrice;
                 });
-
                 if (filteredItems.length > 0) {
                     filteredSections[section] = filteredItems;
                 }
             });
-
             if (Object.keys(filteredSections).length > 0) {
                 filtered[category] = filteredSections;
             }
         });
-
         return filtered;
     }, [searchTerm, priceFilter]);
 
@@ -279,17 +246,14 @@ const CompleteMenu = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50" ref={menuContainerRef}>
-            {/* Compact Header - Shows when main header is scrolled out */}
+        <div className="min-h-screen bg-gray-50">
+
+            {/* Sticky Header Section */}
+            {/* This div will stick to the top of the viewport when scrolling */}
             <div
-                className="fixed inset-x-0 z-40"
-                style={{
-                    top: `${SCROLLED_NAV_HEIGHT}px`,
-                    transform: showCompactHeader ? 'translateY(0)' : 'translateY(-100%)',
-                    opacity: showCompactHeader ? 1 : 0,
-                    transition: 'transform 0.3s ease-in-out, opacity 0.3s ease-in-out',
-                    pointerEvents: showCompactHeader ? 'auto' : 'none'
-                }}
+                ref={headerRef}
+                className="sticky z-40"
+                style={{ top: `${TOP_NAV_HEIGHT}px` }}
             >
                 <CompactHeader
                     featuredItems={featuredItems}
@@ -300,91 +264,16 @@ const CompleteMenu = () => {
                 />
             </div>
 
-            {/* Main Header Section */}
-            <div ref={headerRef}>
-                {/* Combined Header */}
-                <div className="bg-blue-900 text-white py-12">
-                    <div className="max-w-7xl mx-auto px-4">
-                        <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
-                            {/* Title Section */}
-                            <div className="text-center lg:text-left">
-                                <h1 className="text-5xl font-bold mb-2">Our Menu</h1>
-                                <p className="text-xl text-blue-200">Authentic Swedish cuisine since 1945</p>
-                            </div>
+            {/* Menu Content Section */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="flex flex-col lg:flex-row gap-8" ref={menuSectionRef}>
 
-                            {/* Customer Favorites */}
-                            <div className="w-full lg:w-auto">
-                                <h2 className="text-xl font-semibold text-yellow-400 mb-3 text-center lg:text-left">Customer Favorites</h2>
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                    {featuredItems.map((item, index) => {
-                                        const Icon = item.icon;
-                                        return (
-                                            <div key={index} className="bg-white/10 backdrop-blur rounded-lg px-4 py-3 flex items-center justify-between hover:bg-white/20 transition-colors">
-                                                <div className="flex items-center">
-                                                    <Icon className="text-yellow-400 mr-2" size={18} />
-                                                    <span className="font-medium text-white">{item.title}</span>
-                                                </div>
-                                                <span className="text-yellow-400 font-bold ml-2">{item.price}</span>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/*OLD Search and Filter Bar*/}
-
-                {/* Search and Filter Bar */}
-                {/*<div className="bg-gray-50 py-8">*/}
-                {/*    <div className="max-w-7xl mx-auto px-4">*/}
-                {/*        <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200 mb-8">*/}
-                {/*            <div className="flex flex-col md:flex-row gap-4">*/}
-                {/*                <div className="flex-1">*/}
-                {/*                    <div className="relative">*/}
-                {/*                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />*/}
-                {/*                        <input*/}
-                {/*                            type="text"*/}
-                {/*                            placeholder="Search menu items..."*/}
-                {/*                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"*/}
-                {/*                            value={searchTerm}*/}
-                {/*                            onChange={(e) => setSearchTerm(e.target.value)}*/}
-                {/*                        />*/}
-                {/*                    </div>*/}
-                {/*                </div>*/}
-                {/*                <div className="flex gap-2">*/}
-                {/*                    <div className="relative">*/}
-                {/*                        <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />*/}
-                {/*                        <select*/}
-                {/*                            className="pl-10 pr-8 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"*/}
-                {/*                            value={priceFilter}*/}
-                {/*                            onChange={(e) => setPriceFilter(e.target.value)}*/}
-                {/*                        >*/}
-                {/*                            <option value="all">All Prices</option>*/}
-                {/*                            <option value="under10">Under $10</option>*/}
-                {/*                            <option value="under15">Under $15</option>*/}
-                {/*                            <option value="over15">$15 and up</option>*/}
-                {/*                        </select>*/}
-                {/*                    </div>*/}
-                {/*                </div>*/}
-                {/*            </div>*/}
-                {/*        </div>*/}
-                {/*    </div>*/}
-                {/*</div>*/}
-            </div>
-
-            {/* Menu Content */}
-            <div className={`max-w-7xl mx-auto px-18 transition-all duration-300 pt-4 ${showCompactHeader ? 'pt-16' : 'pt-0'}`}>
-                <div className="flex flex-col lg:flex-row gap-8 pb-8" ref={menuSectionRef}>
-                    {/* Category Navigation */}
+                    {/* Category Navigation (Sidebar) */}
                     <div className="lg:w-64">
                         <div
-                            className="sticky transition-all duration-300"
-                            style={{
-                                top: showCompactHeader ? `${SCROLLED_NAV_HEIGHT + COMPACT_HEADER_HEIGHT + 14}px` : '32px',
-                                transition: 'top 0.3s ease-in-out'
-                            }}>
+                            className="sticky"
+                            style={{ top: `${headerHeight + TOP_NAV_HEIGHT + 24}px` }}
+                        >
                             <h3 className="text-lg font-bold text-gray-900 mb-4">Categories</h3>
                             <nav className="space-y-2">
                                 {Object.keys(menuData).map((category) => {
@@ -393,10 +282,10 @@ const CompleteMenu = () => {
                                         <button
                                             key={category}
                                             onClick={() => handleCategoryChange(category)}
-                                            className={`w-full text-left px-4 py-3 rounded-lg flex items-center justify-between transition-all ${
+                                            className={`w-full text-left px-4 py-3 rounded-lg flex items-center justify-between transition-all duration-200 ${
                                                 activeCategory === category
                                                     ? 'bg-blue-900 text-white shadow-lg'
-                                                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                                                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
                                             }`}
                                         >
                                             <div className="flex items-center">
@@ -410,7 +299,7 @@ const CompleteMenu = () => {
                             </nav>
 
                             {/* Hours Info */}
-                            <div className="mt-8 bg-blue-100 rounded-lg p-4">
+                            <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
                                 <div className="flex items-center mb-2">
                                     <Clock className="text-blue-900 mr-2" size={20} />
                                     <h4 className="font-bold text-blue-900">Hours</h4>
@@ -420,8 +309,15 @@ const CompleteMenu = () => {
                         </div>
                     </div>
 
-                    {/* Menu Content */}
+                    {/* Menu Items */}
                     <div className="flex-1 min-h-screen">
+                        {Object.keys(filteredMenu).length === 0 && (
+                            <div className="text-center py-16 bg-white rounded-lg shadow-md">
+                                <p className="text-gray-500 text-lg font-semibold">No menu items found.</p>
+                                <p className="text-gray-400 mt-2">Try adjusting your search or filters.</p>
+                            </div>
+                        )}
+
                         {Object.entries(filteredMenu).map(([category, sections]) => (
                             <div
                                 key={category}
@@ -439,17 +335,17 @@ const CompleteMenu = () => {
 
                                 <div className="space-y-6">
                                     {Object.entries(sections).map(([section, items]) => (
-                                        <div key={section} className="bg-white rounded-xl shadow-lg overflow-hidden">
+                                        <div key={section} className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200/80">
                                             <button
                                                 onClick={() => toggleSection(`${category}-${section}`)}
-                                                className="w-full px-6 py-4 bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 transition-colors"
+                                                className="w-full px-6 py-4 bg-white hover:bg-gray-50 transition-colors"
                                             >
                                                 <div className="flex items-center justify-between">
                                                     <h3 className="text-xl font-bold text-blue-900">{section}</h3>
                                                     <div className="flex items-center">
                                                         <span className="text-sm text-gray-600 mr-3">{items.length} items</span>
                                                         <ChevronDown
-                                                            className={`text-blue-900 transform transition-transform ${
+                                                            className={`text-blue-900 transform transition-transform duration-300 ${
                                                                 expandedSections[`${category}-${section}`] ? 'rotate-180' : ''
                                                             }`}
                                                             size={24}
@@ -458,16 +354,16 @@ const CompleteMenu = () => {
                                                 </div>
                                             </button>
 
-                                            <div className={`transition-all duration-300 ${
+                                            <div className={`transition-all duration-500 ease-in-out ${
                                                 expandedSections[`${category}-${section}`] ? 'max-h-[2000px]' : 'max-h-0'
                                             } overflow-hidden`}>
-                                                <div className="p-6 space-y-4">
+                                                <div className="p-6 pt-0 space-y-4">
                                                     {items.map((item, index) => (
                                                         <div
                                                             key={index}
-                                                            className="flex justify-between items-start py-3 border-b border-gray-100 last:border-0 hover:bg-gray-50 px-4 -mx-4 rounded-lg transition-colors"
+                                                            className="flex justify-between items-start py-3 border-t border-gray-100"
                                                         >
-                                                            <div className="flex-1">
+                                                            <div className="flex-1 pr-4">
                                                                 <h4 className="font-semibold text-gray-900 flex items-center">
                                                                     {item.title}
                                                                     {item.featured && (
@@ -478,7 +374,7 @@ const CompleteMenu = () => {
                                                                     <p className="text-sm text-gray-600 mt-1">{item.description}</p>
                                                                 )}
                                                             </div>
-                                                            <span className="text-lg font-bold text-blue-700 ml-4">{item.price}</span>
+                                                            <span className="text-lg font-bold text-blue-700">{item.price}</span>
                                                         </div>
                                                     ))}
                                                 </div>
@@ -488,13 +384,6 @@ const CompleteMenu = () => {
                                 </div>
                             </div>
                         ))}
-
-                        {/* No results message */}
-                        {Object.keys(filteredMenu).length === 0 && (
-                            <div className="text-center py-12">
-                                <p className="text-gray-500 text-lg">No menu items found matching your search.</p>
-                            </div>
-                        )}
                     </div>
                 </div>
             </div>
