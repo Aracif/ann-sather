@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { signIn, signOut, getCurrentUser, confirmSignIn } from 'aws-amplify/auth';
+import CreateMenuItem from './CreateMenuItem.tsx'; // Import the new component
 
 const AdminPage = () => {
     const [user, setUser] = useState(null);
@@ -19,13 +20,12 @@ const AdminPage = () => {
     const [username, setUsername] = useState(''); // We'll use email as the username
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(true); // Start loading to check for a current session
-
-    // --- NEW STATE VARIABLES ---
     // This state will control showing the "Set New Password" form
     const [showNewPasswordForm, setShowNewPasswordForm] = useState(false);
     // This state will hold the user's chosen new password
     const [newPassword, setNewPassword] = useState('');
-    // --- END NEW STATE ---
+
+    const [isCreateModalOpen, setCreateModalOpen] = useState(false);
 
     // Check for a logged-in user when the component mounts
     useEffect(() => {
@@ -113,6 +113,17 @@ const AdminPage = () => {
             setError(err.message || 'Error signing out.');
         }
         setIsLoading(false);
+    };
+
+    // --- Handlers for the modal ---
+    const openCreateModal = () => setCreateModalOpen(true);
+    const closeCreateModal = () => setCreateModalOpen(false);
+    const handleSaveItem = (newItem) => {
+        console.log('New item saved:', newItem);
+        // Optionally, you can add logic here to refresh a list of items
+        // For now, we'll just close the modal.
+        // You could also leave it open if the user wants to add multiple items in a row.
+        // closeCreateModal();
     };
 
     // While checking for a session, show a loader
@@ -238,6 +249,9 @@ const AdminPage = () => {
     // If a user is logged in, show the admin dashboard
     return (
         <div className="min-h-screen bg-gray-100 font-sans">
+            {/* --- RENDER THE MODAL CONDITIONALLY --- */}
+            {isCreateModalOpen && <CreateMenuItem onClose={closeCreateModal} onSave={handleSaveItem} />}
+
             <header className="bg-blue-900 text-white shadow-lg">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center py-4">
@@ -263,18 +277,24 @@ const AdminPage = () => {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
+                    {/* --- MODIFIED MENU ITEMS CARD --- */}
                     <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-2xl transition-shadow transform hover:-translate-y-1">
                         <div className="flex items-center text-blue-800 mb-4">
                             <Utensils size={28} className="mr-3" />
                             <h2 className="text-2xl font-bold">Menu Items</h2>
                         </div>
                         <p className="text-gray-600 mb-6">Add, edit, or remove menu items and view their popularity.</p>
-                        <button className="w-full flex justify-center items-center bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                        {/* THIS BUTTON NOW OPENS THE MODAL */}
+                        <button
+                            onClick={openCreateModal}
+                            className="w-full flex justify-center items-center bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition-colors"
+                        >
                             <PlusCircle size={20} className="mr-2" />
-                            Manage Menu
+                            Add New Item
                         </button>
                     </div>
 
+                    {/* ... other cards (Locations, Content Pages) remain the same ... */}
                     <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-2xl transition-shadow transform hover:-translate-y-1">
                         <div className="flex items-center text-blue-800 mb-4">
                             <MapPin size={28} className="mr-3" />
@@ -286,7 +306,6 @@ const AdminPage = () => {
                             Manage Locations
                         </button>
                     </div>
-
                     <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-2xl transition-shadow transform hover:-translate-y-1">
                         <div className="flex items-center text-blue-800 mb-4">
                             <Edit size={28} className="mr-3" />
@@ -298,6 +317,7 @@ const AdminPage = () => {
                             Manage Content
                         </button>
                     </div>
+
                 </div>
             </main>
         </div>
