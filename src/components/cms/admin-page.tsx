@@ -1,49 +1,197 @@
 //--- Admin Page Component ---
-import {Edit, LayoutDashboard, LogIn, LogOut, MapPin, PlusCircle, Utensils} from "lucide-react";
-import {useState} from "react";
+// AdminPage.tsx
 
-const AdminPage = ({ setCurrentPage }) => {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+import {
+    Edit,
+    LayoutDashboard,
+    LogIn,
+    LogOut,
+    MapPin,
+    PlusCircle,
+    Utensils,
+} from "lucide-react";
+import { useState, useEffect } from "react";
+import { signIn, signOut, getCurrentUser, confirmSignIn } from 'aws-amplify/auth';
+
+const AdminPage = () => {
+    const [user, setUser] = useState(null);
     const [password, setPassword] = useState('');
+    const [username, setUsername] = useState(''); // We'll use email as the username
     const [error, setError] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true); // Start loading to check for a current session
 
-    // Mock authentication function
+    // --- NEW STATE VARIABLES ---
+    // This state will control showing the "Set New Password" form
+    const [showNewPasswordForm, setShowNewPasswordForm] = useState(false);
+    // This state will hold the user's chosen new password
+    const [newPassword, setNewPassword] = useState('');
+    // --- END NEW STATE ---
+
+    // Check for a logged-in user when the component mounts
+    useEffect(() => {
+        const checkUser = async () => {
+            try {
+                const currentUser = await getCurrentUser();
+                setUser(currentUser);
+            } catch (error) {
+                // No user is signed in
+                setUser(null);
+            }
+            setIsLoading(false);
+        };
+
+        checkUser();
+    }, []);
+
+
     const handleLogin = async (e) => {
         e.preventDefault();
         setIsLoading(true);
         setError('');
 
-        // In a real app, you'd call your backend here.
-        // We'll simulate a network delay.
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // If the user is already being prompted for a new password,
+        // call the confirmation handler instead.
+        if (showNewPasswordForm) {
+            await handleConfirmNewPassword();
+            return;
+        }
 
-        if (password === 'admin123') {
-            setIsAuthenticated(true);
-        } else {
-            setError('Invalid password. Please try again.');
+        try {
+            const { isSignedIn, nextStep } = await signIn({
+                username,
+                password,
+            });
+
+            // --- NEW LOGIC TO HANDLE NEXT STEP ---
+            if (nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED') {
+                // If Cognito requires a new password, show the form and stop.
+                setShowNewPasswordForm(true);
+            } else if (isSignedIn) {
+                // If sign-in is complete, fetch the user and proceed.
+                const currentUser = await getCurrentUser();
+                setUser(currentUser);
+            }
+            // --- END NEW LOGIC ---
+
+        } catch (err) {
+            setError(err.message || 'An error occurred during sign-in.');
             setPassword('');
         }
         setIsLoading(false);
     };
 
-    const handleLogout = () => {
-        setIsAuthenticated(false);
-        setPassword('');
+
+    // --- NEW HANDLER FUNCTION ---
+    const handleConfirmNewPassword = async () => {
+        setIsLoading(true);
         setError('');
+        try {
+            // Use confirmSignIn to send the new password
+            await confirmSignIn({ challengeResponse: newPassword });
+
+            // After successful confirmation, the user is signed in.
+            const currentUser = await getCurrentUser();
+            setUser(currentUser);
+            setShowNewPasswordForm(false); // Hide the new password form
+            setNewPassword(''); // Clear the password state
+        } catch (err) {
+            setError(err.message || 'Failed to set new password. Please try again.');
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    // --- END NEW HANDLER ---
+    const handleLogout = async () => {
+        setIsLoading(true);
+        try {
+            await signOut();
+            setUser(null);
+            setUsername('');
+            setPassword('');
+        } catch (err) {
+            setError(err.message || 'Error signing out.');
+        }
+        setIsLoading(false);
     };
 
-    if (!isAuthenticated) {
+    // While checking for a session, show a loader
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-blue-900">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-yellow-400"></div>
+            </div>
+        );
+    }
+
+    // --- RENDER THE NEW PASSWORD FORM CONDITIONALLY ---
+    if (showNewPasswordForm) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-blue-900 font-sans p-4">
+                <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-2xl shadow-2xl text-center">
+                    <h2 className="text-4xl font-bold text-blue-900">Set New Password</h2>
+                    <p className="mt-2 text-gray-600">Please choose a new password to complete your first sign-in.</p>
+
+                    <form className="space-y-6" onSubmit={handleLogin}>
+                        <div className="text-left">
+                            <label htmlFor="newPassword" className="text-sm font-bold text-gray-700 tracking-wide">
+                                New Password
+                            </label>
+                            <input
+                                id="newPassword"
+                                name="newPassword"
+                                type="password"
+                                required
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                                className="w-full mt-2 p-3 text-lg border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-4 focus:ring-yellow-400 focus:border-yellow-400 transition"
+                                placeholder="••••••••"
+                            />
+                        </div>
+                        {error && <p className="text-red-600 text-sm">{error}</p>}
+                        <div>
+                            <button
+                                type="submit"
+                                disabled={isLoading}
+                                className="w-full flex justify-center items-center bg-yellow-400 text-blue-900 font-bold p-3 rounded-lg hover:bg-yellow-500 transition-all duration-300 disabled:bg-gray-400"
+                            >
+                                {isLoading ? 'Setting...' : 'Confirm and Sign In'}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        )
+    }
+    // --- END CONDITIONAL RENDER ---
+
+    // If no user is logged in, show the login form
+    if (!user) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-blue-900 font-sans p-4">
                 <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-2xl shadow-2xl text-center">
                     <div>
                         <h2 className="text-4xl font-bold text-blue-900">Admin Access</h2>
-                        <p className="mt-2 text-gray-600">Please enter the password to manage content.</p>
-                        <p className="mt-2 text-sm text-gray-500">(Hint: the password is `admin123`)</p>
+                        <p className="mt-2 text-gray-600">Please sign in to manage content.</p>
                     </div>
 
                     <form className="space-y-6" onSubmit={handleLogin}>
+                        <div className="text-left">
+                            <label htmlFor="email" className="text-sm font-bold text-gray-700 tracking-wide">
+                                Email
+                            </label>
+                            <input
+                                id="email"
+                                name="email"
+                                type="email"
+                                required
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                className="w-full mt-2 p-3 text-lg border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-4 focus:ring-yellow-400 focus:border-yellow-400 transition"
+                                placeholder="admin@example.com"
+                            />
+                        </div>
+
                         <div className="text-left">
                             <label htmlFor="password" className="text-sm font-bold text-gray-700 tracking-wide">
                                 Password
@@ -87,6 +235,7 @@ const AdminPage = ({ setCurrentPage }) => {
         );
     }
 
+    // If a user is logged in, show the admin dashboard
     return (
         <div className="min-h-screen bg-gray-100 font-sans">
             <header className="bg-blue-900 text-white shadow-lg">
