@@ -16,7 +16,26 @@ import AboutUs from './components/AboutUs';
 import Catering from "./components/Catering.tsx";
 import Recipes from "./components/Recipes.tsx";
 import AdminPage from "./components/cms/admin-page.tsx";
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import {Amplify} from "aws-amplify";
+
+Amplify.configure({
+    Auth: {
+        Cognito: {
+            userPoolId: 'us-east-2_HzIoGsAYn', // Found in your Cognito User Pool details
+            userPoolClientId: '1pvg7p14k9pacfp49k696n5kp2', // Found in your Cognito User Pool App client details
+            region: 'us-east-2',
+        }
+    },
+    API: {
+        REST: {
+            'RestaurantMenuAPI': {
+                endpoint: 'https://htdv60daf3.execute-api.us-east-2.amazonaws.com/dev', // The "Invoke URL" from your API Gateway deployment
+                region: 'us-east-2',
+
+            }
+        }
+    }
+});
 
 const AnnSatherWebsite = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
