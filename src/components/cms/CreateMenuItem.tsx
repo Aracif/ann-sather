@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { post } from 'aws-amplify/api';
 import { Utensils, X } from 'lucide-react';
+import { fetchAuthSession } from 'aws-amplify/auth';
 
 const CreateMenuItem = ({ onClose, onSave }) => {
     const [title, setTitle] = useState('');
@@ -13,51 +14,66 @@ const CreateMenuItem = ({ onClose, onSave }) => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!title || !price || !mealType || !category) {
-            setError("All fields except 'Featured' are required.");
-            return;
-        }
 
         setIsLoading(true);
         setError('');
         setSuccess('');
 
+        if (!title || !price || !mealType || !category) {
+            setError("All fields except 'Featured' are required.");
+            setIsLoading(false);
+            return;
+        }
+
         try {
-            // Construct the payload for the API
+            // Step 1: Get the current user's session and token.
+            const session = await fetchAuthSession();
+            const token = session.tokens?.idToken?.toString();
+
+            // If for any reason the token isn't there, stop.
+            if (!token) {
+                throw new Error("User session is valid, but ID token is missing.");
+            }
+
+            console.log("✅ Auth session found! Manually adding token to the Authorization header.");
+
             const newItem = {
                 title,
-                price: parseFloat(price), // Send price as a number
+                price: parseFloat(price),
                 mealType,
-                category: category.toUpperCase().replace(/\s+/g, '_'), // Format category for the backend
-                featured: featured.toString() // Send featured as a string
+                category: category.toUpperCase().replace(/\s+/g, '_'),
+                featured: featured.toString(),
             };
 
+            // Step 2: Manually add the token to the 'Authorization' header in the request.
             const response = await post({
                 apiName: 'RestaurantMenuAPI',
                 path: '/menu',
-                options: { body: newItem }
+                options: {
+                    body: newItem,
+                    headers: {
+                        Authorization: token
+                    }
+                }
             }).response;
 
             const result = await response.body.json();
 
             setSuccess(`Successfully created item: "${result.title}"!`);
-            onSave(result); // Notify parent component
+            onSave(result);
 
-            // Reset form
             setTitle('');
             setPrice('');
             setCategory('');
             setFeatured(false);
 
-        } catch (err) {
-            console.error("Error creating menu item:", err);
-            const errorMessage = err.response ? await err.response.body.json() : { message: "An unknown error occurred." };
-            setError(errorMessage.message || 'Failed to create item. Please check the console for details.');
+        } catch (err: any) {
+            console.error("❌ An error occurred during submission:", err);
+            setError(err.message || 'Failed to create item. Please check the console.');
         } finally {
             setIsLoading(false);
-            // Hide success message after a few seconds
             setTimeout(() => setSuccess(''), 5000);
         }
     };
