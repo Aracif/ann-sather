@@ -12,7 +12,8 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { signIn, signOut, getCurrentUser, confirmSignIn } from 'aws-amplify/auth';
-import CreateMenuItem from './CreateMenuItem.tsx'; // Import the new component
+import CreateMenuItem from './CreateMenuItem.tsx';
+import SeedDatabase from "./seed-database.tsx"; // Import the new component
 
 const AdminPage = () => {
     const [user, setUser] = useState(null);
@@ -275,6 +276,11 @@ const AdminPage = () => {
                     <h2 className="text-3xl font-bold text-gray-900 mb-2">Content Management</h2>
                     <p className="text-lg text-gray-600">Select a category below to edit website content.</p>
                 </div>
+
+                {/* --- 2. ADD THE SEED UTILITY HERE --- */}
+                {/* It's recommended to only show this in a development environment */}
+                {process.env.NODE_ENV === 'development' && <SeedDatabase />}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
                     {/* --- MODIFIED MENU ITEMS CARD --- */}
