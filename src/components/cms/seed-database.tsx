@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { post } from 'aws-amplify/api';
+import {authedPost} from "../../utils/apiClient.ts";
 
 // The full menu data you provided
 const menuData = {
@@ -174,14 +175,8 @@ const SeedDatabase = () => {
         for (let i = 0; i < allItems.length; i++) {
             const item = allItems[i];
             try {
-                // Use the same API call as your CreateMenuItem component
-                await post({
-                    apiName: 'RestaurantMenuAPI',
-                    path: '/menu',
-                    options: {
-                        body: item
-                    }
-                }).response;
+                const operation = await authedPost('/menu', { body: item });
+                await operation.response; // Wait for the request to complete
 
                 setResults(prev => ({ ...prev, success: prev.success + 1 }));
 
