@@ -86,16 +86,34 @@ const AdminPage = () => {
 
     // --- NEW: FUNCTION TO HANDLE ITEM DELETION ---
     const handleDeleteItem = async (itemToDelete) => {
-        // Simple browser confirmation
+        // This itemToDelete object comes from your state and was originally fetched from the API.
+        // It already has the correct .mealType and .categoryAndItemId
+        console.log("Item to delete:", itemToDelete); // Add this log to see the object
+
         if (!window.confirm(`Are you sure you want to delete "${itemToDelete.title}"?`)) {
             return;
         }
 
         try {
-            const path = `/menu/${itemToDelete.mealType}/${itemToDelete.categoryAndItemId}`;
+            // You MUST use the exact mealType and categoryAndItemId from the object.
+            // Do NOT try to build the key from other properties like 'category' or 'itemId'.
+
+            const mealType = itemToDelete.mealType;
+
+            // This is the complete, correct ID from the database.
+            const categoryAndItemId = itemToDelete.categoryAndItemId;
+
+            // URL encode the sort key in case it contains special characters like '#'
+            const encodedCategoryAndItemId = encodeURIComponent(categoryAndItemId);
+
+            // Construct the path exactly as your API Gateway expects it.
+            const path = `/menu/${mealType}/${encodedCategoryAndItemId}`;
+
+            console.log("Sending DELETE request to path:", path); // Add this log for final verification
+
             await authedDel(path);
 
-            // Remove the item from the local state for an instant UI update
+            // This part is correct - it updates the UI instantly.
             setMenuItems(prevItems => prevItems.filter(item => item.categoryAndItemId !== itemToDelete.categoryAndItemId));
 
         } catch (err) {
