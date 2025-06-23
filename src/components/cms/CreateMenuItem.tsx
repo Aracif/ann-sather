@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { post } from 'aws-amplify/api';
 import { Utensils, X } from 'lucide-react';
 import { fetchAuthSession } from 'aws-amplify/auth';
+import {authedPost} from "../../utils/apiClient.ts";
 
 const CreateMenuItem = ({ onClose, onSave }) => {
     const [title, setTitle] = useState('');
@@ -47,18 +48,13 @@ const CreateMenuItem = ({ onClose, onSave }) => {
                 featured: featured.toString(),
             };
 
-            // Step 2: Manually add the token to the 'Authorization' header in the request.
-            const response = await post({
-                apiName: 'RestaurantMenuAPI',
-                path: '/menu',
-                options: {
-                    body: newItem,
-                    headers: {
-                        Authorization: token
-                    }
-                }
-            }).response;
+            // 1. Await our authedPost function. It now creates the correct object structure.
+            const operation = await authedPost('/menu', { body: newItem });
 
+            // 2. Await the response promise from the operation.
+            const response = await operation.response;
+
+            // 3. Get the final JSON result.
             const result = await response.body.json();
 
             setSuccess(`Successfully created item: "${result.title}"!`);
