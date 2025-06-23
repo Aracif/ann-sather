@@ -128,28 +128,48 @@ const CateringSection = () => {
 
                 {showDeliveryInfo && (
                     <div className="bg-white text-blue-900 rounded-xl shadow-lg p-6 max-w-3xl mx-auto mb-10 text-sm">
-                        <h4 className="text-lg font-bold">Deliveries</h4>
-                        <p>To place a catering delivery order, please call: <strong>773-348-2378</strong>.</p>
-                        <p>We ask that you give us <strong>24-hour notice</strong> to ensure availability. Orders for next day must be placed by <strong>2 p.m.</strong></p>
-                        <p>Deliveries are for groups of <strong>10 or more</strong>.</p>
-                        <p><strong>Delivery Charges:</strong></p>
-                        <ul className="list-disc ml-5">
-                            <li>$30.00 — North, West city limits & Downtown</li>
-                            <li>$35.00 — South of 35th to 75th St</li>
-                            <li>$40.00 — South of 75th & local suburbs (20+ people)</li>
-                            <li>$50.00 — Holidays (30+ people)</li>
+
+                        <h4 className="text-lg font-bold mb-4">Deliveries</h4>
+                        <p className="mb-2">
+                            To place a catering delivery order, please call: <strong>773-348-2378</strong>.
+                        </p>
+                        <p className="mb-2">
+                            We ask that you give us <strong>24-hour notice</strong> to ensure the menu items you desire are available.
+                            However, if you do have a last minute order we will do our very best to accommodate your needs.
+                        </p>
+                        <p className="mb-2">
+                            To ensure the timeliness of your delivery and the availability of items ordered, our cut-off time is <strong>2 p.m.</strong>
+                            when placing an order for next day delivery.
+                        </p>
+                        <p className="mb-2">
+                            Deliveries are available for groups of <strong>10 or more</strong>.
+                        </p>
+                        <p className="mb-2"><strong>Delivery Charges are as follows:</strong></p>
+                        <ul className="list-disc ml-5 mb-4">
+                            <li>$30.00 — North to the city limits, west to the city limits and south to 35th Street (includes Downtown)</li>
+                            <li>$35.00 — City south of 35th Street to 75th Street</li>
+                            <li>$40.00 — South of 75th Street and local suburbs (Require groups of <strong>20</strong> or more)</li>
+                            <li>$50.00 — Holidays (Require groups of <strong>30</strong> or more)</li>
                         </ul>
-                        <p><strong>Included:</strong> Disposable plates, utensils, beverage cups, napkins</p>
-                        <p><strong>Extras:</strong> Tablecloths ($5), Chafing Set-ups ($7)</p>
-                        <p>Flowers, linens, china and serving staff also available. Ask about off-premises catering.</p>
-                        <p><strong>Beverages</strong>: Coffee, tea, soda at <strong>$3.25 per person</strong>.</p>
-                        <p><strong>Payment:</strong> Cash, corporate checks, Visa, MasterCard, AmEx. No personal checks.</p>
+                        <p className="mb-2">
+                            Special requests are our specialty. Don't be afraid to ask, we may have it. Below are some items which are generally
+                            requested and we always have in stock:
+                        </p>
+                        <p className="mb-2"><strong>Disposable (included with deliveries):</strong> Plates, Forks, Knives, Spoons, Serving Utensils, Beverage Cups, Napkins</p>
+                        <p className="mb-2">Other: Vinyl Tablecloths (<strong>$5 per tablecloth</strong>) Chafing Set-ups (<strong>$7 per set-up</strong>)</p>
+                        <p className="mb-2">
+                            Many other items, such as Flowers, Linens, and China are available. We can also supply our experienced staff for your serving needs.
+                            Ask about our Off-Premises Catering.
+                        </p>
+                        <p className="mb-2">Beverages are available (coffee, tea or soda) at an additional $3.25 per person.</p>
+                        <p className="mb-2"><em>We accept Cash, Corporate Checks, Visa, MasterCard, and American Express. Sorry, no Personal Checks.</em></p>
                     </div>
                 )}
 
-                {renderAccordion('breakfast', 'Breakfast Packages', <BreakfastCaterMenu />)}
+
+                {renderAccordion('breakfast', 'Breakfast', <BreakfastCaterMenu />)}
                 {renderAccordion('lunch', 'Lunch & Dinner', <LunchDinerCaterMenu />)}
-                {renderAccordion('alaCarte', 'A La Carte Menu', <ALaCarteCaterMenu />)}
+                {renderAccordion('alaCarte', 'A La Carte', <ALaCarteCaterMenu />)}
                 {renderAccordion('holiday', 'Holiday Specials', <HolidaySpecialsCaterMenu />)}
                 {renderAccordion('desserts', 'Appetizers & Desserts', <AppetizersDessertsCaterMenu />)}
             </div>
