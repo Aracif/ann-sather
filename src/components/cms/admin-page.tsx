@@ -13,7 +13,10 @@ import {
 import { useState, useEffect } from "react";
 import { signIn, signOut, getCurrentUser, confirmSignIn } from 'aws-amplify/auth';
 import CreateMenuItem from './CreateMenuItem.tsx';
-import SeedDatabase from "./seed-database.tsx"; // Import the new component
+import SeedDatabase from "./seed-database.tsx";
+import {authedDel, authedGet} from "../../utils/apiClient.ts";
+import UpdateMenuItem from "./UpdateMenuItem.tsx";
+import MenuList from "./MenuList.tsx"; // Import the new component
 
 const AdminPage = () => {
     const [user, setUser] = useState(null);
@@ -26,24 +29,111 @@ const AdminPage = () => {
     // This state will hold the user's chosen new password
     const [newPassword, setNewPassword] = useState('');
 
+    // --- NEW STATE FOR MENU MANAGEMENT ---
     const [isCreateModalOpen, setCreateModalOpen] = useState(false);
+    const [isUpdateModalOpen, setUpdateModalOpen] = useState(false);
+    const [itemToEdit, setItemToEdit] = useState(null);
+    const [menuItems, setMenuItems] = useState([]);
+    const [isLoadingItems, setIsLoadingItems] = useState(false);
+    const [apiError, setApiError] = useState('');
+    const [selectedMealType, setSelectedMealType] = useState('Breakfast');
+    const mealTypes = ['Breakfast', 'Lunch', 'Specials', 'Entrees']; // Define your meal types
+
 
     // Check for a logged-in user when the component mounts
+    // --- UPDATED useEffect to fetch items on login and mealType change ---
     useEffect(() => {
-        const checkUser = async () => {
+        const checkUserAndFetchData = async () => {
+            setIsLoading(true);
             try {
                 const currentUser = await getCurrentUser();
                 setUser(currentUser);
+                // If user is logged in, fetch items for the default meal type
+                await fetchMenuItems(selectedMealType);
             } catch (error) {
                 // No user is signed in
                 setUser(null);
             }
             setIsLoading(false);
         };
+        checkUserAndFetchData();
+    }, []); // Only run on initial component mount
 
-        checkUser();
-    }, []);
+    // --- NEW: A separate effect to refetch when the meal type changes ---
+    useEffect(() => {
+        if (user) { // Only fetch if the user is logged in
+            fetchMenuItems(selectedMealType);
+        }
+    }, [selectedMealType, user]); // Dependency array
 
+    // --- NEW: FUNCTION TO FETCH MENU ITEMS ---
+    const fetchMenuItems = async (mealType) => {
+        setIsLoadingItems(true);
+        setApiError('');
+        try {
+            const operation = await authedGet(`/menu/${mealType}`);
+            const response = await operation.response;
+            const data = await response.body.json();
+            setMenuItems(data);
+        } catch (err) {
+            console.error("Error fetching menu items:", err);
+            setApiError('Failed to load menu items.');
+            setMenuItems([]); // Clear items on error
+        } finally {
+            setIsLoadingItems(false);
+        }
+    };
+
+    // --- NEW: FUNCTION TO HANDLE ITEM DELETION ---
+    const handleDeleteItem = async (itemToDelete) => {
+        // Simple browser confirmation
+        if (!window.confirm(`Are you sure you want to delete "${itemToDelete.title}"?`)) {
+            return;
+        }
+
+        try {
+            const path = `/menu/${itemToDelete.mealType}/${itemToDelete.categoryAndItemId}`;
+            await authedDel(path);
+
+            // Remove the item from the local state for an instant UI update
+            setMenuItems(prevItems => prevItems.filter(item => item.categoryAndItemId !== itemToDelete.categoryAndItemId));
+
+        } catch (err) {
+            console.error('Error deleting item:', err);
+            setApiError(err.message || 'Failed to delete item.');
+        }
+    };
+    // --- MODAL HANDLERS ---
+    const openCreateModal = () => setCreateModalOpen(true);
+    const closeCreateModal = () => setCreateModalOpen(false);
+
+    const openUpdateModal = (item) => {
+        setItemToEdit(item);
+        setUpdateModalOpen(true);
+    };
+    const closeUpdateModal = () => {
+        setItemToEdit(null);
+        setUpdateModalOpen(false);
+    };
+
+    // --- SAVE HANDLERS (to update UI after create/update) ---
+    const handleSaveNewItem = (newItem) => {
+        // If the new item's mealType matches the selected one, add it to the list
+        if (newItem.mealType === selectedMealType) {
+            setMenuItems(prev => [...prev, newItem]);
+        }
+        // You might want to automatically switch to the new item's meal type tab
+        // setSelectedMealType(newItem.mealType);
+        closeCreateModal();
+    };
+
+    const handleSaveUpdatedItem = (updatedItem) => {
+        // Find and replace the item in the local state
+        setMenuItems(prev => prev.map(item =>
+            item.categoryAndItemId === updatedItem.categoryAndItemId ? updatedItem : item
+        ));
+        closeUpdateModal();
+    };
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -117,8 +207,8 @@ const AdminPage = () => {
     };
 
     // --- Handlers for the modal ---
-    const openCreateModal = () => setCreateModalOpen(true);
-    const closeCreateModal = () => setCreateModalOpen(false);
+    // const openCreateModal = () => setCreateModalOpen(true);
+    // const closeCreateModal = () => setCreateModalOpen(false);
     const handleSaveItem = (newItem) => {
         console.log('New item saved:', newItem);
         // Optionally, you can add logic here to refresh a list of items
@@ -250,8 +340,10 @@ const AdminPage = () => {
     // If a user is logged in, show the admin dashboard
     return (
         <div className="min-h-screen bg-gray-100 font-sans">
-            {/* --- RENDER THE MODAL CONDITIONALLY --- */}
-            {isCreateModalOpen && <CreateMenuItem onClose={closeCreateModal} onSave={handleSaveItem} />}
+            {/* --- RENDER MODALS CONDITIONALLY --- */}
+            {isCreateModalOpen && <CreateMenuItem onClose={closeCreateModal} onSave={handleSaveNewItem} />}
+            {isUpdateModalOpen && <UpdateMenuItem onClose={closeUpdateModal} onSave={handleSaveUpdatedItem} itemToEdit={itemToEdit} />}
+
 
             <header className="bg-blue-900 text-white shadow-lg">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -284,21 +376,50 @@ const AdminPage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
                     {/* --- MODIFIED MENU ITEMS CARD --- */}
-                    <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-2xl transition-shadow transform hover:-translate-y-1">
-                        <div className="flex items-center text-blue-800 mb-4">
-                            <Utensils size={28} className="mr-3" />
-                            <h2 className="text-2xl font-bold">Menu Items</h2>
+                    {/* --- NEW MENU MANAGEMENT SECTION --- */}
+                    <div className="bg-white p-6 rounded-xl shadow-md mt-10">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-4">
+                            <div className="flex items-center text-blue-800 mb-4 sm:mb-0">
+                                <Utensils size={28} className="mr-3" />
+                                <h2 className="text-2xl font-bold">Menu Items</h2>
+                            </div>
+                            <button
+                                onClick={openCreateModal}
+                                className="w-full sm:w-auto flex justify-center items-center bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                            >
+                                <PlusCircle size={20} className="mr-2" />
+                                Add New Item
+                            </button>
                         </div>
-                        <p className="text-gray-600 mb-6">Add, edit, or remove menu items and view their popularity.</p>
-                        {/* THIS BUTTON NOW OPENS THE MODAL */}
-                        <button
-                            onClick={openCreateModal}
-                            className="w-full flex justify-center items-center bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition-colors"
-                        >
-                            <PlusCircle size={20} className="mr-2" />
-                            Add New Item
-                        </button>
+
+                        {/* --- MEAL TYPE TABS --- */}
+                        <div className="flex flex-wrap gap-y-2 space-x-2 border-b-2 border-gray-200 mb-4">
+                            {mealTypes.map(meal => (
+                                <button
+                                    key={meal}
+                                    onClick={() => setSelectedMealType(meal)}
+                                    className={`px-4 py-2 font-semibold text-lg transition-colors ${
+                                        selectedMealType === meal
+                                            ? 'border-b-4 border-yellow-400 text-blue-900'
+                                            : 'text-gray-500 hover:text-blue-800'
+                                    }`}
+                                >
+                                    {meal}
+                                </button>
+                            ))}
+                        </div>
+                        {/* --- API ERROR DISPLAY --- */}
+                        {apiError && <p className="text-red-500 bg-red-100 p-3 rounded-md my-4">{apiError}</p>}
+
+                        {/* --- MENU LIST --- */}
+                        <MenuList
+                            items={menuItems}
+                            isLoading={isLoadingItems}
+                            onEdit={openUpdateModal}
+                            onDelete={handleDeleteItem}
+                        />
                     </div>
+
 
                     {/* ... other cards (Locations, Content Pages) remain the same ... */}
                     <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-2xl transition-shadow transform hover:-translate-y-1">
