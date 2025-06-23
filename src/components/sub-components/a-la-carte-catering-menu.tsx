@@ -1,159 +1,124 @@
 const ALaCarteCaterMenu = () => {
     return (
         <div className="bg-white rounded-xl shadow-lg overflow-hidden max-w-4xl mx-auto">
-            <div className="p-6 space-y-6 text-sm text-blue-900 leading-relaxed">
-                {/* A LA CARTE BREAKFAST OPTIONS */}
-                <div>
-                    <h4 className="text-lg font-bold mb-2">A La Carte Breakfast Options</h4>
+            <div className="p-6 space-y-4 text-sm text-blue-900 leading-relaxed">
 
-                    <div className="space-y-3">
-                        <div>
-                            <p className="font-semibold">Egg Dishes</p>
-                            <ul className="list-disc ml-5">
-                                <li>Egg and Cheese Strata — $7.00 per Person (Minimum 10)</li>
-                                <li>Scrambled Eggs — $6.50 per Person (Minimum 10)</li>
-                                <li>Eggs Florentine — $7.00 per Person (Minimum 10)</li>
-                                <li>Quiche — $16.00 Each (Serves 6–8)</li>
-                            </ul>
-                        </div>
+                <h4 className="text-xl font-bold pt-4">A LA CARTE BREAKFAST OPTIONS</h4>
 
-                        <div>
-                            <p className="font-semibold">Pancakes & French Toast</p>
-                            <ul className="list-disc ml-5">
-                                <li>Swedish Pancakes with Lingonberries — $5.50 per Person</li>
-                                <li>Sweet Bread French Toast — $6.50 per Person</li>
-                                <li>French Toast — $6.50 per Person</li>
-                            </ul>
-                        </div>
+                <p className="text-lg font-bold mb-0">Egg Dishes</p>
+                <p>Egg and Cheese Strata: $7.00 per Person<br />Minimum 10 People
+                    <br/>
+                Scrambled Eggs: $6.50 per Person<br />Minimum 10 People
+                Eggs Florentine: $7.00 per Person<br />Minimum 10 People
+                Quiche: $16.00 Each<br />Serves Six to Eight People</p>
 
-                        <div>
-                            <p className="font-semibold">Breakfast Pastries</p>
-                            <ul className="list-disc ml-5">
-                                <li>Regular Sized Cinnamon Rolls — $20.25 per Dozen</li>
-                                <li>Assorted Bagels with Cream Cheese & Veggies — $5.00 per Person (10 Min)</li>
-                                <li>Assorted Sweet Breads — $7.25 per Loaf</li>
-                            </ul>
-                        </div>
+                <p className="text-lg font-bold mb-0">Pancakes & French Toast</p>
+                <p>Swedish Pancakes With Lingonberries: $5.50 per Person
+                    <br/>
+                Sweet Bread French Toast: $6.50 per Person
+                    <br/>
+                    French Toast: $6.50 per Person</p>
 
-                        <div>
-                            <p className="font-semibold">Breakfast Meats</p>
-                            <ul className="list-disc ml-5">
-                                <li>Bacon — $3.75</li>
-                                <li>Ham — $4.20</li>
-                                <li>Sausage — $3.75</li>
-                                <li>Turkey Sausage — $3.75</li>
-                                <li>Fresh Nova Lox — $10.00</li>
-                            </ul>
-                        </div>
+                <p className="text-lg font-bold mb-0">Breakfast Pastries</p>
+                <p>Regular Sized Cinnamon Rolls: $20.25 per Dozen
+                <br/>
+                Assorted Bagels(Served with Cream Cheese, Sliced Tomato, Red Onion and Pickles): $5.00 per Person
+                    <br/>
+                Assorted Sweet Breads: $7.25 per Loaf</p>
 
-                        <div>
-                            <p className="font-semibold">Breakfast Sides</p>
-                            <ul className="list-disc ml-5">
-                                <li>Seasonal Fresh Fruit — $3.75</li>
-                                <li>Granola with Plain Yogurt — $8.75</li>
-                                <li>Hash Brown Potatoes — $3.20</li>
-                                <li>Hash Brown with Cheese — $3.75</li>
-                            </ul>
-                        </div>
+                <p className="text-lg font-bold mb-0">Breakfast Meats</p>
+                <p>Bacon: $3.75 per Person
+                    <br/>
+                Ham: $4.20 per Person
+                    <br/>
+                Sausage: $3.75 per Person
+                    <br/>
+                Turkey Sausage: $3.75 per Person
+                    <br/>
+                    Fresh Nova Lox: $10.00 per Person</p>
 
-                        <div>
-                            <p className="font-semibold">Beverages</p>
-                            <ul className="list-disc ml-5">
-                                <li>Regular or Decaf Coffee — $25.00 per Box</li>
-                                <li>Hot Tea — $25.00 per Box</li>
-                                <li>Milk — $3.20 per Person</li>
-                                <li>Soft Drinks — $3.25 per Person</li>
-                                <li>Fresh Squeezed Orange Juice — $19.50 per Gallon</li>
-                                <li>Fresh Grapefruit Juice — $19.50 per Gallon</li>
-                                <li>Fresh Brewed Iced Tea — $18.50 per Gallon</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
 
-                {/* A LA CARTE DINNER OPTIONS */}
-                <div>
-                    <h4 className="text-lg font-bold mb-2">A La Carte Dinner Options*</h4>
+                <p className="text-lg font-bold mb-0">Breakfast Sides</p>
+                <p>Seasonal Fresh Fruit: $3.75 per Person
+                <br/>
+               Granola with Plain Yogurt: $8.75 per Person
+                    <br/>
+                Hash Brown Potatoes: $3.20 per Person
+                    <br/>
+                Hash Brown with Cheese: $3.75 per Person</p>
 
-                    <div className="space-y-3">
-                        <div>
-                            <p className="font-semibold">Beef & Pork Entrees</p>
-                            <ul className="list-disc ml-5">
-                                <li>Swedish Meatballs — $8.25</li>
-                                <li>Roast Tenderloin of Beef — $10.25</li>
-                                <li>Baked Ham — $8.25</li>
-                            </ul>
-                        </div>
+                <p className="text-lg font-bold mb-0">Beverages</p>
+                <p>
+                    Regular or Decaf Coffee: $25.00 per Box<br />
+                    Hot Tea: $25.00 per Box<br />
+                    Milk: $3.20 per Person<br />
+                    Soft Drinks (Coke, Diet Coke and Sprite): $3.25 per Person<br/>
+                    Fresh Squeezed Orange Juice: $19.50 per Gallon<br />
+                    Fresh Grapefruit Juice: $19.50 per Gallon<br />
+                    Fresh Brewed Iced Tea: $18.50 per Gallon
+                </p>
 
-                        <div>
-                            <p className="font-semibold">Chicken & Turkey Entrees</p>
-                            <ul className="list-disc ml-5">
-                                <li>Roast Turkey with Dressing — $8.25</li>
-                                <li>Baked Spring Chicken — $8.95</li>
-                                <li>Grilled Breast of Chicken — $8.95</li>
-                                <li>Chicken Penne Pasta — $8.25</li>
-                            </ul>
-                        </div>
 
-                        <div>
-                            <p className="font-semibold">Seafood Entrees</p>
-                            <ul className="list-disc ml-5">
-                                <li>Cajun Crab Cakes — $9.25</li>
-                                <li>Broiled Salmon — $10.25</li>
-                            </ul>
-                        </div>
+                <h4 className="text-xl font-bold pt-4">ALA CARTE DINNER OPTIONS*</h4>
 
-                        <div>
-                            <p className="font-semibold">Vegetarian Entrees</p>
-                            <ul className="list-disc ml-5">
-                                <li>Vegetarian Penne Pasta — $7.25</li>
-                                <li>Vegetarian Lasagna — $7.25</li>
-                                <li>Vegetarian Stuffed Peppers — $8.25</li>
-                            </ul>
-                        </div>
+                <p className="text-lg font-bold mb-0">Beef & Pork Entrees</p>
+                <p>
+                    Swedish Meatballs: $8.25<br />
+                    Roast Tenderloin of Beef: $10.25<br />
+                    Baked Ham: $8.25
+                </p>
 
-                        <div>
-                            <p className="font-semibold">Starters</p>
-                            <ul className="list-disc ml-5">
-                                <li>House Salad — $4.95</li>
-                                <li>Roasted Vegetable Salad — $4.95</li>
-                                <li>Black Bean Salad — $4.95</li>
-                                <li>Caesar Salad — $4.95</li>
-                                <li>Cucumber Salad — $4.95</li>
-                                <li>Pasta Salad — $4.95</li>
-                                <li>Spinach Salad — $5.75</li>
-                            </ul>
-                        </div>
+                <p className="text-lg font-bold mb-0">Chicken & Turkey Entrees</p>
+                <p>
+                    Roast Turkey with Dressing: $8.25<br />
+                    Baked Spring Chicken: $8.95<br />
+                    Grilled Breast of Chicken: $8.95<br />
+                    Chicken Penne Pasta: $8.25
+                </p>
 
-                        <div>
-                            <p className="font-semibold">Sides</p>
-                            <ul className="list-disc ml-5">
-                                <li>Rice Pilaf — $3.95</li>
-                                <li>Mashed Potatoes — $3.95</li>
-                                <li>Boiled New Potatoes — $3.95</li>
-                                <li>Steamed Mixed Vegetables — $3.95</li>
-                                <li>Steamed Broccoli — $3.95</li>
-                                <li>Steamed Carrots — $3.95</li>
-                                <li>Corn on the Cob — $3.95</li>
-                            </ul>
-                        </div>
 
-                        <div>
-                            <p className="font-semibold">Beverages</p>
-                            <ul className="list-disc ml-5">
-                                <li>Regular or Decaf Coffee — $3.25</li>
-                                <li>Soft Drinks — $3.25</li>
-                                <li>Fresh Brewed Iced Tea — $18.50 per Gallon</li>
-                            </ul>
-                        </div>
+                <p className="text-lg font-bold mb-0">Seafood Entrees</p>
+                <p>Cajun Crab Cakes: $9.25
+                    <br/>
+                   Broiled Salmon: $10.25</p>
 
-                        <p className="italic mt-2">*Also Available for Luncheons</p>
-                    </div>
-                </div>
+                <p className="text-lg font-bold mb-0">Vegetarian Entrees</p>
+                    <p>Vegetarian Penne Pasta: $7.25 <br/>
+                    Vegetarian Lasagna: $7.25<br/>
+                    Vegetarian Stuffed Peppers: $8.25</p>
 
-                <div className="mt-4">
-                    <p><strong>Onsite Catering:</strong> Please Add $3.25 per Person for Beverage Service.</p>
-                </div>
+                <p className="text-lg font-bold mb-0">Starters</p>
+                <p>
+                    House Salad: $4.95<br />
+                    Roasted Vegetable Salad: $4.95<br />
+                    Black Bean Salad: $4.95<br />
+                    Caesar Salad: $4.95<br />
+                    Cucumber Salad: $4.95<br />
+                    Pasta Salad: $4.95<br />
+                    Spinach Salad: $5.75
+                </p>
+
+                <p className="text-lg font-bold mb-0">Sides</p>
+                <p>
+                    Rice Pilaf: $3.95<br />
+                    Mashed Potatoes: $3.95<br />
+                    Boiled New Potatoes: $3.95<br />
+                    Steamed Mixed Vegetables: $3.95<br />
+                    Steamed Broccoli: $3.95<br />
+                    Steamed Carrots: $3.95<br />
+                    Corn on the Cob: $3.95
+                </p>
+
+
+                <p className="text-lg font-bold mb-0">Beverages</p>
+                <p>Regular or Decaf Coffee: $3.25<br/>
+                Soft Drinks (Coke, Diet Coke and Sprite): $3.25<br/>
+                Fresh Brewed Iced Tea: $18.50 per Gallon</p>
+
+                <p className="pt-4 mb-0"><em>*Also Available for Luncheons</em></p>
+
+                <p><em>Onsite Catering: Please Add $3.25 per Person for Beverage Service</em></p>
+
             </div>
         </div>
     );
