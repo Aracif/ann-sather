@@ -377,7 +377,7 @@ const AdminPage = () => {
 
                     {/* --- MODIFIED MENU ITEMS CARD --- */}
                     {/* --- NEW MENU MANAGEMENT SECTION --- */}
-                    <div className="bg-white p-6 rounded-xl shadow-md mt-10">
+                    <div className="bg-white p-6 rounded-xl shadow-md mt-10 md:col-span-2 lg:col-span-3">
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-4">
                             <div className="flex items-center text-blue-800 mb-4 sm:mb-0">
                                 <Utensils size={28} className="mr-3" />
@@ -428,7 +428,7 @@ const AdminPage = () => {
                             <h2 className="text-2xl font-bold">Locations</h2>
                         </div>
                         <p className="text-gray-600 mb-6">Update restaurant locations, hours, and contact info.</p>
-                        <button className="w-full flex justify-center items-center bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                        <button disabled={true} className="w-full flex justify-center items-center bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition-colors">
                             <PlusCircle size={20} className="mr-2" />
                             Manage Locations
                         </button>

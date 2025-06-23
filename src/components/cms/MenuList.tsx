@@ -18,16 +18,16 @@ const MenuList = ({ items, onEdit, onDelete, isLoading }) => {
 
     // This effect runs when the `items` prop changes. It automatically
     // opens the first category in the list for a better user experience.
-    useEffect(() => {
-        const categories = Object.keys(groupedItems);
-        if (categories.length > 0) {
-            // Sort categories alphabetically before picking the first one
-            const sortedCategories = categories.sort((a, b) => a.localeCompare(b));
-            setOpenCategory(sortedCategories[0]);
-        } else {
-            setOpenCategory(null); // Reset if there are no items
-        }
-    }, [items]); // Dependency array ensures this runs when items are loaded/changed
+    // useEffect(() => {
+    //     const categories = Object.keys(groupedItems);
+    //     if (categories.length > 0) {
+    //         // Sort categories alphabetically before picking the first one
+    //         const sortedCategories = categories.sort((a, b) => a.localeCompare(b));
+    //         setOpenCategory(sortedCategories[0]);
+    //     } else {
+    //         setOpenCategory(null); // Reset if there are no items
+    //     }
+    // }, [items]); // Dependency array ensures this runs when items are loaded/changed
 
     // Display a loading spinner while fetching data
     if (isLoading) {
