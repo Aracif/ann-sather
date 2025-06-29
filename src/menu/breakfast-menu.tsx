@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Search, Filter, Coffee, Utensils, Star, ChevronRight, Clock, ChevronDown, Sparkles } from 'lucide-react';
 import CompactHeader from '../menu/CompactHeader.jsx';
+import {authedGet} from "../utils/apiClient.ts";
 
 // Menu data (keeping the same)
 const menuData = {
@@ -140,14 +141,12 @@ const menuData = {
     }
 };
 
-// Featured items for quick access
-const featuredItems = [
-    { title: "Famous Cinnamon Rolls", price: "$4.75", category: "Breakfast", icon: Sparkles },
-    { title: "Swedish Pancakes", price: "$13.50", category: "Breakfast", icon: Star },
-    { title: "Swedish Meatballs", price: "$15.50", category: "Entrees", icon: Star }
-];
+
 
 const CompleteMenu = () => {
+    const [menuData, setMenuData] = useState({});
+    const [isLoadingMenu, setIsLoadingMenu] = useState(true);
+    const [menuError, setMenuError] = useState('');
     const [activeCategory, setActiveCategory] = useState('Breakfast');
     const [searchTerm, setSearchTerm] = useState('');
     const [expandedSections, setExpandedSections] = useState({});
@@ -162,12 +161,79 @@ const CompleteMenu = () => {
 
     const [headerHeight, setHeaderHeight] = useState(0);
 
+    // Featured items for quick access
+// Dynamically extract featured items from loaded data
+    const featuredItems = useMemo(() => {
+        const items = [];
+        Object.entries(menuData).forEach(([category, sections]) => {
+            Object.entries(sections).forEach(([section, sectionItems]) => {
+                sectionItems.forEach(item => {
+                    if (item.featured) {
+                        items.push({
+                            ...item,
+                            category,
+                            icon: item.title.includes('Cinnamon') ? Sparkles : Star
+                        });
+                    }
+                });
+            });
+        });
+        return items.slice(0, 3); // Return top 3 featured items
+    }, [menuData]);
+
     // Measure header height
     useEffect(() => {
         if (headerRef.current) {
             setHeaderHeight(headerRef.current.offsetHeight);
         }
     }, [searchTerm, priceFilter]); // Re-calculate if content changes
+
+
+    // Fetch menu data on component mount
+    useEffect(() => {
+        const fetchAllMenuData = async () => {
+            setIsLoadingMenu(true);
+            setMenuError('');
+
+            const mealTypes = ['Breakfast', 'Lunch', 'Specials', 'Entrees'];
+            const fetchedData = {};
+
+            try {
+                // Fetch data for each meal type
+                for (const mealType of mealTypes) {
+                    const operation = await authedGet(`/menu/${mealType}`);
+                    const response = await operation.response;
+                    const data = await response.body.json();
+
+                    // Transform the flat array into the nested structure expected by the component
+                    const categorizedData = {};
+                    data.forEach(item => {
+                        const category = item.category;
+                        if (!categorizedData[category]) {
+                            categorizedData[category] = [];
+                        }
+                        categorizedData[category].push({
+                            title: item.title,
+                            price: item.price,
+                            featured: item.featured || false,
+                            description: item.description || ''
+                        });
+                    });
+
+                    fetchedData[mealType] = categorizedData;
+                }
+
+                setMenuData(fetchedData);
+            } catch (err) {
+                console.error('Error fetching menu data:', err);
+                setMenuError('Failed to load menu items. Please try again later.');
+            } finally {
+                setIsLoadingMenu(false);
+            }
+        };
+
+        fetchAllMenuData();
+    }, []);
 
     // Handle category change and scroll to the top of the menu section
     const handleCategoryChange = (category) => {
@@ -232,7 +298,7 @@ const CompleteMenu = () => {
             }
         });
         return filtered;
-    }, [searchTerm, priceFilter]);
+    }, [menuData, searchTerm, priceFilter]);
 
     // Get icon for category
     const getCategoryIcon = (category) => {
@@ -247,7 +313,23 @@ const CompleteMenu = () => {
 
     return (
         <div className="min-h-screen bg-gray-50">
+            {/* Add loading state */}
+            {isLoadingMenu && (
+                <div className="flex items-center justify-center h-64">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-900"></div>
+                </div>
+            )}
 
+            {/* Add error state */}
+            {menuError && (
+                <div className="max-w-7xl mx-auto px-4 py-8">
+                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                        {menuError}
+                    </div>
+                </div>
+            )}
+            {!isLoadingMenu && !menuError && (
+                <>
             {/* Sticky Header Section */}
             {/* This div will stick to the top of the viewport when scrolling */}
             <div
@@ -387,6 +469,9 @@ const CompleteMenu = () => {
                     </div>
                 </div>
             </div>
+
+                </>
+            )}
         </div>
     );
 };
