@@ -214,7 +214,7 @@ const CompleteMenu = () => {
                         }
                         categorizedData[category].push({
                             title: item.title,
-                            price: item.price,
+                            price: Number(item.price),
                             featured: item.featured || false,
                             description: item.description || ''
                         });
@@ -271,7 +271,9 @@ const CompleteMenu = () => {
             }
         }
     }, [activeCategory]);
-
+    const formatCurrency = (amount: number) =>
+        new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
+            .format(amount); // → $1,234.00
     // Filter menu items based on search and price
     const filteredMenu = useMemo(() => {
         const filtered = {};
@@ -456,7 +458,7 @@ const CompleteMenu = () => {
                                                                     <p className="text-sm text-gray-600 mt-1">{item.description}</p>
                                                                 )}
                                                             </div>
-                                                            <span className="text-lg font-bold text-blue-700">{item.price}</span>
+                                                            <span className="text-lg text-black-700">{formatCurrency(item.price)}</span>
                                                         </div>
                                                     ))}
                                                 </div>
