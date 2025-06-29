@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Search, Filter, Coffee, Utensils, Star, ChevronRight, Clock, ChevronDown, Sparkles } from 'lucide-react';
 import CompactHeader from '../menu/CompactHeader.jsx';
-import {authedGet} from "../utils/apiClient.ts";
+import {authedGet, publicGet} from "../utils/apiClient.ts";
 
 // Menu data (keeping the same)
 const menuData = {
@@ -201,7 +201,7 @@ const CompleteMenu = () => {
             try {
                 // Fetch data for each meal type
                 for (const mealType of mealTypes) {
-                    const operation = await authedGet(`/menu/${mealType}`);
+                    const operation = await publicGet(`/menu/${mealType}`);
                     const response = await operation.response;
                     const data = await response.body.json();
 

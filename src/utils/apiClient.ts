@@ -47,8 +47,35 @@ const withAuth = (requestFn: Function) => {
     };
 };
 
-// Create and export our new, authenticated API methods
+/**
+ * Wrapper for public API requests (no authentication required)
+ * @param requestFn The original Amplify function (e.g., amplifyPost)
+ * @returns A new async function that performs a public request.
+ */
+const withoutAuth = (requestFn: Function) => {
+    return async (path: string, options: any = {}): Promise<any> => {
+        try {
+            const result = requestFn({
+                apiName: 'RestaurantMenuAPI',
+                path,
+                options,
+            });
+            return result;
+        } catch (error) {
+            console.error('Public API Client Error:', error);
+            throw error;
+        }
+    };
+};
+
+// Authenticated API methods
 export const authedPost = withAuth(amplifyPost);
 export const authedGet = withAuth(amplifyGet);
 export const authedPut = withAuth(amplifyPut);
 export const authedDel = withAuth(amplifyDel);
+
+// Public API methods (no authentication)
+export const publicPost = withoutAuth(amplifyPost);
+export const publicGet = withoutAuth(amplifyGet);
+export const publicPut = withoutAuth(amplifyPut);
+export const publicDel = withoutAuth(amplifyDel);
