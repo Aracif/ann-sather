@@ -51,8 +51,8 @@ const UpdateMenuItem = ({ onClose, onSave, itemToEdit }) => {
             };
 
             // Construct the specific path for the item
-            const path = `/menu/${itemToEdit.mealType}/${itemToEdit.categoryAndItemId}`;
-
+            const path = `/menu/${itemToEdit.mealType}/${encodeURIComponent(itemToEdit.categoryAndItemId)}`;
+            console.log('Updating path:', path);
             const operation = await authedPut(path, { body: updatedData });
             const response = await operation.response;
             const result = await response.body.json();
