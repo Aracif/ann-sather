@@ -44,7 +44,8 @@ const CreateMenuItem = ({ onClose, onSave }) => {
                 title,
                 price: parseFloat(price),
                 mealType,
-                category: category.toUpperCase().replace(/\s+/g, '_'),
+                // category: category.toUpperCase().replace(/\s+/g, '_'),
+                category: category.trim(),
                 featured: featured.toString(),
             };
 
