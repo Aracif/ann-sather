@@ -1,25 +1,59 @@
+
 import React, { useEffect, useRef, useState } from 'react';
-import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
+
+const recipeData = [
+    {
+        title: 'Breakfast',
+        image: 'src/assets/images/Breakfast-Sampler.jpg',
+        pdfLinks: [
+            { name: 'Swedish Pancakes', url: 'pdfs/swedish-pancakes.pdf' },
+            { name: 'Hart-Shaped Waffles', url: 'pdfs/hart-shaped-waffles.pdf' },
+            { name: 'Bran Muffins', url: 'pdfs/bran-muffins.pdf' },
+            { name: 'Cinnamon Rolls', url: 'pdfs/cinnamon-rolls.pdf' },
+            { name: 'Powdered Sugar Glazes', url: 'pdfs/powdered-sugar-glazed.pdf' },
+        ]
+    },
+    {
+        title: 'Starters',
+        image: 'src/assets/images/catering/AnnSather-Avocado Wrap-S.jpg',
+        pdfLinks: [
+            { name: 'House Salad', url: 'pdfs/house-salad.pdf' }
+        ]
+    },
+    {
+        title: 'Sides',
+        image: 'src/assets/images/catering/3egg_omelet.jpg',
+        pdfLinks: [
+            { name: 'Hash Browns', url: 'pdfs/hash-browns.pdf' }
+        ]
+    },
+    {
+        title: 'Entrees',
+        image: 'src/assets/images/catering/AnnSather-Steak & Eggs 2-S.jpg',
+        pdfLinks: [
+            { name: 'Swedish Meatballs', url: 'pdfs/swedish-meatballs.pdf' }
+        ]
+    },
+    {
+        title: 'Desserts',
+        image: 'src/assets/images/catering/swedish_pancakes.jpg',
+        pdfLinks: [
+            { name: 'Pumpkin Squares', url: 'pdfs/pumpkin-squares.pdf' }
+        ]
+    }
+];
 
 const Recipes = () => {
     const [isVisible, setIsVisible] = useState(false);
-    const [isExpanded, setIsExpanded] = useState(false);
+    const [activeCategory, setActiveCategory] = useState(null);
     const sectionRef = useRef<HTMLDivElement | null>(null);
 
-    // Handle scroll animation
     useEffect(() => {
         const currentRef = sectionRef.current;
         if (!currentRef) return;
 
         const observer = new IntersectionObserver(
-            ([entry]) => {
-                setIsVisible(entry.isIntersecting);
-
-                // Collapse when it's out of view
-                if (!entry.isIntersecting) {
-                    setIsExpanded(false);
-                }
-            },
+            ([entry]) => setIsVisible(entry.isIntersecting),
             { threshold: 0.2 }
         );
 
@@ -27,108 +61,80 @@ const Recipes = () => {
         return () => observer.disconnect();
     }, []);
 
-    // Auto-expand if navigated via #about
     useEffect(() => {
         if (window.location.hash === '#recipes') {
-            setIsExpanded(false);
             sectionRef.current?.scrollIntoView({ behavior: 'smooth' });
         }
     }, []);
-
-    const toggleExpanded = () => setIsExpanded(prev => !prev);
-
 
     return (
         <section
             id="recipes"
             ref={sectionRef}
-            className={`bg-blue-900 text-white px-6 py-14 max-w-7xl mx-auto transition-opacity duration-1000 ease-out ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4' }`} >
-
-
+            className={`relative bg-blue-900 text-white px-6 py-14 max-w-7xl mx-auto transition-opacity duration-1000 ease-out ${
+                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}
+        >
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center pt-10 mb-6 leading-relaxed px-4">
                 Cooking at Home with Ann Sather
             </h2>
 
-            <p className={"max-w-5xl mx-auto text-justify leading-relaxed px-4"}>
+            <p className="max-w-5xl mx-auto text-justify leading-relaxed px-4">
                 Do you think it’s possible to replicate our much celebrated cinnamon rolls,
                 Swedish pancakes, roast duck or one of our delectable pies at home?
                 We don’t think so, either, but we are giving you the opportunity to try.
             </p>
 
-            <p className={"max-w-5xl mx-auto text-justify leading-relaxed px-4"}>
-
+            <p className="max-w-5xl mx-auto text-justify leading-relaxed px-4">
                 In 1994, Ann Sather’s restaurants published a 50th anniversary cookbook.
                 Due to popular demand, we now have recipes for some of our much-loved dishes
                 available online. Download the recipes for your favorite menu items below and
                 get cooking!
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 m-10 px-4 max-w-5xl mx-auto">
-                {[
-                    { title: 'Breakfast', link: 'pdfs/', image: 'src/assets/images/catering/3egg_omelet.jpg' },
-                    { title: 'Starters', link: 'pdfs/', image: 'src/assets/images/catering/3egg_omelet.jpg'},
-                    { title: 'Sides', link: 'pdfs/', image: 'src/assets/images/catering/3egg_omelet.jpg'},
-                    { title: 'Entrees', link: 'pdfs/', image: 'src/assets/images/catering/3egg_omelet.jpg'},
-                    { title: 'Desserts', link: 'pdfs/', image: 'src/assets/images/catering/swedish_pancakes.jpg'},
-                ].map(({ title, link, image }) => (
-                    <a
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8 m-10 px-4 max-w-4xl mx-auto">
+
+                {recipeData.map(({ title, image, pdfLinks }) => (
+                    <div
                         key={title}
-                        href={link}
-                        target={'_blank'}
-                    rel={'noopener noreferrer'}
-                    className={"bg-white text-blue-900 rounded-xl shadow-md hover:shadow-lg p-6 text-center font-semibold transition hover:bg-blue-50"}
+                        onClick={() => setActiveCategory(activeCategory === title ? null : title)}
+                        className="text-blue-900 font-semibold text-center rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 hover:shadow-2xl cursor-pointer"
                     >
-                    <img
-                        src={image}
-                        alt={title}
-                        className={"w-full h-24 object-cover rounded-md mb-3"}
+                      <div className={'relative'}>
+                        <img
+                            src={image}
+                            alt={title}
+                            // className="w-full h-24 object-cover rounded-md mb-3"
+                            className="w-full h-38 object-cover rounded-t-md mb-1"
                         />
-                        {title}
-                    </a>
+                        <div className="bg-yellow-400 text-gray-900 p-1 font-semibold text-center uppercase shadow-lg transform hover:shadow-2xl cursor-pointer flex items-center justify-center"
+
+                        >{title}</div>
+
+                          {activeCategory === title && (
+                              // <div className="bg-blue-900 text-sm text-center pt-4 pb-4 px-6 rounded-b-xl shadow-inner space-y-2">
+                              <div className="absolute left-1/2 -translate-x-1/2 bg-blue-900 px-6 py-4 rounded-xl shadow-lg space-y-2">
+                                  {pdfLinks.map(({ name, url }) => (
+
+                                      <p key={name}>
+                                          <a
+                                              href={url}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              className="inline-block w-36 bg-white text-blue-900 font-medium py-2 px-4 rounded-full text-center hover:bg-yellow-400 hover:text-blue-900 transition"                                          >
+                                              {name}
+                                          </a>
+                                      </p>
+                                  ))}
+                              </div>
+                          )}
+
+                      </div>
+                    </div>
                 ))}
-
-            {/*</div>*/}
-            {/*/!* Collapsible Content *!/*/}
-            {/*<div*/}
-            {/*    className={`transition-all duration-700 ease-in-out overflow-hidden ${*/}
-            {/*        isExpanded ? 'max-h-screen' : 'max-h-0'*/}
-            {/*    }`}*/}
-            {/*>*/}
-
-            {/*    /!*<br/>*!/*/}
-            {/*    <p className={"max-w-5xl mx-auto text-justify leading-relaxed px-4"}>*/}
-
-            {/*        In 1994, Ann Sather’s restaurants published a 50th anniversary cookbook.*/}
-            {/*        Due to popular demand, we now have recipes for some of our much-loved dishes*/}
-            {/*        available online. Download the recipes for your favorite menu items below and*/}
-            {/*        get cooking!*/}
-            {/*    </p>*/}
-            {/*    /!*<br/>*!/*/}
-            {/*    <p className={"max-w-5xl mx-auto text-justify leading-relaxed px-4"}>*/}
-            {/*        Click on any of the following categories to download the mouth watering recipe of your choice.*/}
-            {/*    </p>*/}
-            {/*</div>*/}
-
-            {/*    /!* Toggle Button *!/*/}
-            {/*    <div className="flex justify-center items-center text-center mt-6">*/}
-            {/*        <button*/}
-            {/*            onClick={toggleExpanded}*/}
-            {/*            className="flex items-center justify-center gap-2 text-white hover:text-white/40 cursor-pointer transition-colors"*/}
-            {/*        >*/}
-            {/*            {isExpanded ? (*/}
-            {/*                <>*/}
-            {/*                    Read less <FaChevronUp className="inline-block" />*/}
-            {/*                </>*/}
-            {/*            ) : (*/}
-            {/*                <>*/}
-            {/*                    Read more <FaChevronDown className="inline-block" />*/}
-            {/*                </>*/}
-            {/*            )}*/}
-            {/*        </button>*/}
-                </div>
-            </section>
-    )
-}
+            </div>
+        </section>
+    );
+};
 
 export default Recipes;
